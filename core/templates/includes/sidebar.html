@@ -1,0 +1,41 @@
+{% load static %}
+
+<div class="sidebar" data-color="rose" data-background-color="black">
+    <!--
+      Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
+
+      Tip 2: you can also add an image using data-image tag
+  -->
+    <div class="logo">
+        <a rel="noopener noreferrer"
+           href="{% url 'home' %}" class="simple-text logo-mini">
+            <span class=" text-white">📡</span>
+        </a>
+        <a target="" rel="noopener noreferrer"
+           href="{% url 'home' %}" class="simple-text logo-normal">
+            <span class=" font-weight-bold text-white">EPIC<span class="font-weight-bold text-warning">RADAR</span></span>
+        </a>
+    </div>
+    <div class="sidebar-wrapper">
+        <ul class="nav">
+            <li class="nav-item {% if 'index' in segment %} active {% endif %}">
+                <a class="nav-link" href="{% url 'home' %}">
+                    <i class="material-icons">dashboard</i>
+                    <p>Dashboard</p>
+                </a>
+            </li>
+            <li class="nav-item {% if 'mining' in segment %} active {% endif %}">
+                <a class="nav-link" href="{% url 'home-mining' %}">
+                    <i class="material-icons">add_chart</i>
+                    <p>Mining Calculator</p>
+                </a>
+            </li>
+<!--            <li class="nav-item {% if 'swapic' in segment %} active {% endif %}">-->
+<!--                <a class="nav-link" href="{% url 'swapic-home' %}">-->
+<!--                    <i class="material-icons">swap_vertical_circle</i>-->
+<!--                    <p>SWAPIC!</p>-->
+<!--                </a>-->
+<!--            </li>-->
+        </ul>
+    </div>
+</div>

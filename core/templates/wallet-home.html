@@ -1,0 +1,239 @@
+{% extends "layouts/base.html" %} {% load humanize %} {% load static %} {% load math %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <h3>{{message}}</h3>
+    {% endfor %}
+{% endif %}
+
+<div class="container">
+    <!--    HEADER -->
+    <div class="mb-3">
+        <div class="row d-flex align-items-top">
+            <div class="col-lg-4 col-md-12">
+                <img class="img px-1 py-1 mb-3" src="{% static 'logos/epic.png' %}" alt="" height="150">
+            </div>
+            <div class="col-lg-8 mt-2 col-md-12 mb-5">
+<!--                <span class="h3">Open and transparent Epic-Cash wallet for funding micro initiatives, events and ideas.<br>-->
+<!--                    Project where everyone can contribute and show love to active community members - faucets, tips or aidrops - it's just the beginning!</span>-->
+<!--                <p class="text-muted mt-2 mr-3 h4 text-right"><a href="" class="text-dark">Read more..</a> </p>-->
+                <span class="h3">
+                    Epic Node<sup><span class="h6">beta</sup> - learn the <b>Epic-Cash</b> blockchain by interacting with the live chain,
+                    track node statistics, wallet activity, send or mine coins to learn how to use the technology.
+                    Create a wallet and start trading with others on Telegram or raise micro-funding for community events.
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center align-items-top">
+        <div class="col-lg-6 col-sm-10">
+            <a class="text-center btn btn-rose btn-block text-white h5 py-3 mb-3"
+                href="{% url 'personal-wallet' %}">
+                <span class="btn-label">
+                  <i class="material-icons">check</i>
+                </span>
+                GO TO WALLET APP
+            </a>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center align-items-top">
+        <div class="col-lg-12 col-sm-10">
+        </div>
+    </div>
+
+
+
+    <!--            PRICE STATS -->
+    <div class="row d-flex align-items-top justify-content-center">
+        <div class="col-lg-6 col-md-12">
+            <div class="card card-stats">
+                <div class="card-header card-header-rose card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">equalizer</i>
+                    </div>
+                    <p class="card-category">Epic-Cash price</p>
+                    <h3 class="card-title ">{{vitex_price}} BTC</h3>
+                    <h4 class="card-title mt-2">
+                        {% for currency in epic_prices %}
+                        <span class="">{{currency.1|floatformat:2}} {{currency.0}}</span>
+                        {% endfor %}
+                        {{epic_vs_usd|floatformat:3}} USD
+                    </h4>
+                </div>
+                <div class="card-footer"></div>
+                <div class="">
+                    {% include 'includes/epic_converter.html' %}
+                </div>
+                <div class="card-footer"></div>
+                <div class="d-flex align-items-center justify-content-around mb-4 pb-1 px-2">
+                    <span class="h5 px-2">TRADE ON VITEX: </span>
+                    <a class="h4 badge badge-warning mr-1" href="https://x.vite.net/trade?symbol=EPIC-001_BTC-000" target="_blank">
+                        BTC-EPIC</a>
+                    <a class="h4 badge badge-success" href="https://x.vite.net/trade?symbol=EPIC-001_USDT-000" target="_blank">
+                        USDT-EPIC</a>
+                </div>
+            </div>
+        </div>
+
+        <!--            BALANCE -->
+        <div class="col-lg-6 col-md-12">
+            <div class="card card-stats">
+                <div class="card-header card-header-warning card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">account_balance_wallet</i>
+                    </div>
+                    <p class="card-category">Community wallet balance</p>
+                    <div id="accordion" role="tablist">
+                        <div class="card-collapse mt-3">
+                            <div role="tab" id="headingOne">
+                                <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+                                    <span class="h2 text-dark">{{balances.total.normalize}} EPIC</span>
+                                    <span class="h3 text-dark"><i class="material-icons">keyboard_arrow_down</i></span>
+                                </a>
+                                <span class="text-dark">~{{balances.total|multi:epic_vs_usd|floatformat:2}} USD</span>
+                                </h4>
+                            </div>
+                            <div id="collapseOne" class="collapse hide" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion" style="">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table h4 text-dark">
+                                            <tbody>
+                                                <tr><td>Waiting Confirmation</td><td>{{balances.wait_conf}}</td></tr>
+                                                <tr><td>Waiting Finalization</td><td>{{balances.wait_final}}</td></tr>
+                                                <tr><td>Locked</td><td>{{balances.locked}}</td></tr>
+                                                <tr><td>Spendable</td><td>{{balances.spendable}}</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer mt-2"></div>
+
+             <!--            NODE STATS -->
+                {% if node_is_online %}
+                <div class="card-header card-header-success card-header-icon">
+                    <div class="card-icon mt-2">
+                        <i class="material-icons">verified_user</i>
+                    </div>
+                    <p class="card-category">Wallet node</p>
+                    <h3 class="card-title">
+                        Height: {{node_data.tip.height|intcomma}}
+                    </h3>
+                    <h4 class="card-title mb-1">
+                        <span class="mx-1">Blockchain: {{blockchain_size}}GB</span>
+                        <span class="mx-1">Peers: {{node_data.connections}}</span>
+                    </h4>
+                </div>
+                {% else %}
+                    <div class="card-header card-header-danger card-header-icon">
+                        <div class="card-icon mt-0">
+                            <i class="material-icons">unpublished</i>
+                        </div>
+                        <p class="card-category">Wallet node</p>
+                        <h4 class="card-title mt-3">Offline</h4>
+                    </div>
+                {% endif %}
+                <div class="card-footer"></div>
+                <div class="px-4 pb-1">
+                    <span class="h5 d-flex align-items-center justify-content-around">
+                        <span class="material-icons text-info"> info</span>
+                        deposit:
+                        <span class=""> https://epicradar.tech/wallet</span>
+                        <span class="mx-1 material-icons text-success">done_all</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row d-flex align-items-top justify-content-center">
+
+<!--        &lt;!&ndash;    SOCIAL STATS &ndash;&gt;-->
+<!--        <div class="col-lg-6 col-md-12">-->
+<!--            <div class="card card-stats">-->
+<!--                <div class="card-header card-header-primary card-header-icon">-->
+<!--                    <div class="card-icon">-->
+<!--                        <i class="material-icons">account_box</i>-->
+<!--                    </div>-->
+<!--                    <p class="card-category">Social statistics</p>-->
+<!--                    <div class="row mt-4">-->
+<!--                        <div class="col-sm-5 my-3">-->
+<!--                        </div>-->
+<!--                        <div class="col-sm-7">-->
+<!--                            <span class="h4 text-dark mx-3">Accounts</span>-->
+<!--                            <span class="badge h5 badge-pill badge-primary"> {{ecb.wallets.count}}</span>-->
+<!--                            <br>-->
+<!--                            <span class="h4 text-dark mx-3">Transactions</span>-->
+<!--                            <span class="badge h5 badge-pill badge-primary"> {{ecb.transactions.count}}</span>-->
+<!--                            <br>-->
+<!--                            <span class="h4 text-dark mx-3">Volume</span>-->
+<!--                            <span class="badge h5 badge-pill badge-primary"> {{ecb.volume|floatformat:1}} EPIC</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="card-footer"></div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <!--    TRANSACTIONS -->
+        <div class="col-lg-6 col-md-12">
+            <div class="card card-stats">
+                <div class="card-header card-header-info card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">date_range</i>
+                    </div>
+                    <p class="card-category">Last community wallet activity</p>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover">
+                            <tbody class="text-dark">
+                                {% for x in transactions %}
+                                <tr>
+                                    {% for k, v in x.items %}
+                                        {% if k == 'created at' or k == 'confirmed' or k == 'amount' %}
+                                            {% if k == "confirmed" %}
+                                                {% if v == "true" %}
+                                                    <td><span class="material-icons text-success">done_all</span></td>
+                                                {% else %}
+                                                    <td><span class="material-icons text-warning">done</span></td>
+                                                {% endif %}
+                                            {% elif k == "amount" %}
+                                                   <td><span id="tx_amount_text" class="text-{{v|color}} font-weight-bold">
+                                                       {{v}} EPIC
+                                                   </span></td>
+                                            {% else %}
+                                                <td>{{v}}</td>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block javascripts %}
+<script>
+
+   $(document).ready(function() {
+
+   });
+
+</script>
+{% endblock javascripts %}
+
+

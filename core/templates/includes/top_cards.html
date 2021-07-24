@@ -1,0 +1,113 @@
+{% load static %} {% load humanize %} {% load math %}
+<!--    PRICE STATS -->
+<div class="col-lg-4 col-md-6 col-xs-12">
+    <div class="card card-stats">
+        <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+                <i class="material-icons">equalizer</i>
+            </div>
+            <p class="card-category">Epic-Cash price</p>
+            <h3 class="card-title ">{{vitex.closePrice}} BTC</h3>
+            <h4 class="card-title mt-2">
+                {% for currency in epic_prices %}
+                    <span class="mx-2">{{currency.1|floatformat:2}} {{currency.0}}</span>
+                {% endfor %}
+                {{epic_vs_usd|floatformat:2}} USD
+            </h4>
+        </div>
+        <div class="card-footer"></div>
+        <div class="">
+            {% include 'includes/epic_converter.html' %}
+        </div>
+        <div class="card-footer my-2 px-2 text-muted text-center comment">
+            *{{text.eng.price_card_comment}}
+        </div>
+    </div>
+
+</div>
+
+<!--    VOLUME STATS-->
+<div class="col-lg-4 col-md-6 col-xs-12">
+    <div class="card card-stats">
+        <div class="card-header card-header-warning card-header-icon">
+            <div class="card-icon">
+                <i class="material-icons">donut_large</i>
+            </div>
+            <p class="card-category">24h Volume</p>
+            <h3 class="card-title">{{total_volumes|floatformat:0|intcomma}} EPIC</h3>
+            <h4 class="card-title mt-2">
+                <span class="mx-2">{{total_volumes|multi:epic_vs_btc|floatformat:2}} BTC</span>
+                <span class="mx-2">{{total_volumes|multi:epic_vs_usd|floatformat:0|intcomma}} USD</span>
+            </h4>
+        </div>
+        <div class="card-footer mb-2">
+            <table class="table h4">
+                <tbody>
+                    <tr>
+                        <td class="text-left">Market capitalization</td>
+                        <td class="text-right font-weight-bold">
+                            {{explorer.circulating|multi:epic_vs_usd|floatformat:0|intcomma}} USD <br>
+                            {{explorer.circulating|multi:epic_vs_usd|divide:btc_price|floatformat:1|intcomma}} BTC
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer px-2 my-2 text-muted text-center comment">
+            *{{text.eng.volume_card_comment}}
+        </div>
+    </div>
+</div>
+
+<!--            NODE STATS -->
+<div class="col-lg-4 col-md-6 col-xs-12">
+    <div class="card card-stats">
+        {% if node.is_online %}
+        <div class="card-header card-header-success card-header-icon">
+            <div class="card-icon">
+                <i class="material-icons">verified_user</i>
+            </div>
+            <p class="card-category">EPIC-RADAR Node</p>
+            <h3 class="card-title">
+                Height: {{node.data.tip.height|intcomma}}
+            </h3>
+            <h4 class="card-title mt-2">
+                <span class="mx-1">Blockchain: {{node.blockchain_size}}GB</span>
+                <span class="mx-1">Peers: {{node.data.connections}}</span>
+            </h4>
+        </div>
+        {% else %}
+            <div class="card-header card-header-danger card-header-icon">
+                <div class="card-icon mt-0">
+                    <i class="material-icons">unpublished</i>
+                </div>
+                <p class="card-category">EPIC-RADAR Node - Offline</p>
+                <h4 class="card-title my-1">
+                    <a href="https://explorer.epic.tech/" target="_blank" class="text-dark">
+                        <i class="material-icons">login</i> Epic Explorer
+                    </a>
+                </h4>
+            </div>
+        {% endif %}
+        <div class="card-footer mb-2">
+             <table class="table h4">
+                <tbody>
+                    <tr>
+                        <td class="text-left">Network Hashrate</td>
+                        <td class="text-left font-weight-bold">
+                            RandomX: <br>
+                            {{network.hash.randomx|intword}}
+                        </td>
+                        <td class="text-left font-weight-bold">
+                            ProgPow: <br>
+                            {{network.hash.progpow|intword}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-0 px-2 text-muted text-center comment">
+            *{{text.eng.network_card_comment}}
+        </div>
+    </div>
+</div>

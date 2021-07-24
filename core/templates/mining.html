@@ -1,0 +1,293 @@
+{% extends "layouts/base.html" %} {% load humanize %} {% load static %} {% load humanize %} {% load static %} {% load math %}
+
+{% block title %} Mining calculator {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+
+    .lds-dual-ring.hidden {
+        display: none;
+    }
+    .epic_hide {
+        display: none;
+    }
+
+    .epic_show {
+        display : ;
+    }
+
+    /*Spinner Styles*/
+    .lds-dual-ring {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+    }
+    .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 5% auto;
+        border-radius: 50%;
+        border: 6px solid #fff;
+        border-color: #fff transparent #fff transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+    }
+    @keyframes lds-dual-ring {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+   <!--    MINING CALC -->
+<div class="row d-flex justify-content-center justify-content-lg-start justify-content-xl-start">
+    <div class="col-xl-5 col-lg-8 col-md-10 col-sm-12" >
+        <div class="card card-stats">
+            <div class="card-header card-header-rose card-header-icon">
+                <div class="card-icon">
+                    <i class="material-icons">add_chart</i>
+                </div>
+                <p class="card-category" style="font-size: 1.2rem;">Epic-Cash Mining Calculator</p>
+                <p colspan="3" class="text-right font-weight-bold" style="font-size: 0.9rem;">
+                    <a class="text-dark" href="https://explorer.epic.tech/" target="_blank">
+                       <i class="material-icons">login</i> Epic-Cash explorer
+                    </a>
+                </p>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-12">
+                        <table class="table w-100 text-dark table-borderless
+                                      table-responsive">
+                             <thead>
+                                 <th class="text-muted text-start">
+                                     <span class="text-success">●</span>
+                                     Height: {{network.height|intcomma}}
+                                 </th>
+                                 <th class="text-center">
+                                     RandomX
+                                 </th>
+                                 <th class="text-center">
+                                     ProgPoW
+                                 </th>
+                                 <th class="text-center">
+                                     Cuckatoo
+                                 </th>
+                             </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-left">Network Difficulty</td>
+                                    <td class="text-right fs-6 font-weight-bold">
+                                        {{network.diff.randomx|intcomma}}
+                                    </td>
+                                    <td class="text-right fs-6 font-weight-bold">
+                                        {{network.diff.progpow|intcomma}}
+                                    </td>
+                                    <td class="text-right fs-6 font-weight-bold">
+                                        {{network.diff.cuckatoo|intcomma}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left">Network Hashrate</td>
+                                    <td class="text-right fs-6 font-weight-bold">
+                                        {{network.hash.randomx|intcomma}}
+                                    </td>
+                                    <td class="text-right fs-6 font-weight-bold">
+                                        {{network.hash.progpow|intcomma}}
+                                    </td>
+                                    <td class="text-right fs-6 font-weight-bold">
+                                        {{network.hash.cuckatoo|intcomma}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="my-2 px-3">
+                <hr class="hr-text py-1" style="font-color: black">
+            </div>
+
+            <div class="px-3">
+                 <form id="mining_calculator" method="POST" class="forms-sample">
+                 {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group col-lg-12 col-md-12">
+                            <label class="bmd-label-floating" for="rig_hashrate">Rig hashrate (eg. 4000 H/s)</label>
+                            <input type="number" required name="rig_hashrate" id="rig_hashrate"
+                                   class="form-control" autocomplete="false" autofocus>
+                        </div>
+                    </div>
+
+                    <div class="form-row d-flex justify-content-between">
+                         <div class="form-group col-lg-6 col-md-6">
+                            <select required name="algo" id="algo" class="selectpicker" data-style="select-with-transition">
+                                <option selected value="randomx">RandomX (CPU) </option>
+                                <option value="progpow">ProgPoW (GPU)</option>
+                                <option disabled value="progpow">Cuckoo (ASIC) - soon</option>
+                            </select>
+                        </div>
+
+                         <div class="form-group col-lg-6 col-md-6">
+                            <select name="currency" id="currency" class="selectpicker" data-style="select-with-transition">
+                                <option selected value="USD">USD</option>
+                                {% for currency in currency_list %}
+                                    <option  value="{{currency}}">{{currency}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12 cost_button">
+                            <label class="bmd-label-floating" for=""></label>
+                            <div class="btn btn-block btn-outline-info" style="height: 38px">Add Costs</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-10 cost_field">
+                            <label class="bmd-label-floating" for="pool_fee">Pool fee (eg. 2%)</label>
+                            <input type="number" name="pool_fee" id="pool_fee"
+                                   class="form-control" >
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-10 cost_field">
+                            <label class="bmd-label-floating" for="power_consumption">Power consumption (eg. 250 KW/H)</label>
+                            <input type="number" name="power_consumption" id="power_consumption"
+                                   class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-10 cost_field">
+                            <label class="bmd-label-floating" for="electricity_cost">Electricity rate (eg. 0.30 USD)</label>
+                            <input type="number" name="electricity_cost" id="electricity_cost"
+                                   class="form-control" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="row d-flex justify-content-end">
+                        <div class="btn cost_field btn-sm remove_cost_btn btn-out-secondary">Remove costs</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-lg btn-block btn-rose px-2 mt-3">Submit</button>
+                </form>
+
+                <div class="col text-center mt-3">
+                    <div id="loader" class="lds-dual-ring hidden overlay mt-2"></div>
+                </div>
+
+                <div class="table-responsive table_calculator epic_hide mt-2">
+                    <div class="mb-4 h5 px-2">
+                        Average time to mine solo block:
+                        <span class="font-weight-bold" id="solo_block"></span>
+                        <span id="solo_block_days"></span>
+                    </div>
+                    <table class="table w-100" style="font-size: 1.2rem;">
+                         <thead class="calc_table_head">
+                             <tr>
+                                <th class=""><span class="material-icons">history</span></th>
+                                <th class="">Reward</th>
+                                <th class="">Income</th>
+                                <th class="cost_field">Cost</th>
+                                <th class="cost_field">Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calc_table_body" style="font-size: 1.2rem;">
+                            {% for period in periods %}
+                                <tr class="tr_{{period.0}}">
+                                    <td class="td_1_{{period.0}}"></td>
+                                    <td class="td_2_{{period.0}}"></td>
+                                    <td class="td_3_{{period.0}}"></td>
+                                    <td class="td_4_{{period.0}} cost_field"></td>
+                                    <td class="td_5_{{period.0}} cost_field"></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Hidden field to store data in DOM-->
+<input type="hidden" id="rig_reward_pass" value="1" />
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    $(document).ready(function() {
+        $('.cost_field').addClass('epic_hide')
+    });
+
+    $('.cost_button').click(function() {
+        $('.cost_field').removeClass('epic_hide')
+        $('.cost_button').addClass('epic_hide')
+    });
+
+    $('.remove_cost_btn').click(function() {
+        $('.cost_field').addClass('epic_hide')
+        $('.cost_button').removeClass('epic_hide')
+    });
+
+    $(document).on('submit', '#mining_calculator',function(e){
+        e.preventDefault();
+        // SPINNER ON
+        $('.table_calculator').addClass('epic_hide');
+        $('#loader').removeClass('hidden');
+        var csrf = $('input[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type:'POST',
+            url:'{% url "ajax_calculator" %}',
+            data:{
+                rig_hashrate:$('#rig_hashrate').val(),
+                algo:$('#algo').val(),
+                currency:$('#currency').val(),
+                power_consumption: $('#power_consumption').val(),
+                electricity_cost: $('#electricity_cost').val(),
+                pool_fee: $('#pool_fee').val(),
+                csrfmiddlewaretoken: csrf,
+                action: 'mining'
+            },
+            success:function(data) {
+                $('#rig_reward_pass').val(data.rig_reward);
+                console.log($('#rig_reward_pass').val());
+                $('#solo_block').text((data.solo_block.hours_for_one_block).toFixed(2) + 'h');
+                if (data.solo_block.hours_for_one_block > 25) {
+                        $('#solo_block_days').text('(' + (data.solo_block.days).toFixed(1) + ' days')
+                    }
+
+                {% for period in periods %}
+                    $('.td_1_{{period.0}}').text('{{period.0}}');
+                    $('.td_2_{{period.0}}').text((data.rig_reward * '{{period.1}}').toFixed(2) + " " + 'EPIC');
+                    $('.td_3_{{period.0}}').text((data.rig_income.value * '{{period.1}}').toFixed(2) + " " + data.user_input.currency);
+                    $('.td_4_{{period.0}}').text((data.rig_cost.value * '{{period.1}}').toFixed(2) + " " + data.user_input.currency);
+                    $('.td_5_{{period.0}}').text((data.rig_profit.value * '{{period.1}}').toFixed(2) + " " + data.user_input.currency);
+                {% endfor %}
+
+                $('#loader').addClass('hidden');
+                $('.table_calculator').removeClass('epic_hide');
+            }
+        })
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/2.3.1/bokeh.min.js"></script>
+<script src="{% static 'assets/js/plugins/jquery-jvectormap.js' %}"></script>
+{% endblock javascripts %}

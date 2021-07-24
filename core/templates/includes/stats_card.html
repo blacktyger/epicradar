@@ -1,0 +1,50 @@
+{% load static %} {% load humanize %} {% load math %}
+
+<div class="card">
+    <div class="card-header card-header-info card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">handyman</i>
+        </div>
+        <h3 class="card-title">Mining info</h3>
+    </div>
+    <div class="card-body px-3 fs-6 my-3">
+        <div class="">
+            <img class="mb-2 mr-1" src="{% static 'epic-icon.png' %}">
+            <span class="fw-bold">12,123,233</span>
+                out of
+            <span class="fw-bold">21 million</span>
+            in circulation
+            <div class="w-75">
+                <div class="progress mt-2" style="height: 18px!important;">
+                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar"
+                         style="width: 52%;" aria-valuenow="52" aria-valuemin="0" aria-valuemax="100"></div>
+                    <span class="fw-bold">52%</span>
+                </div>
+            </div>
+        </div>
+        <div class="">
+            <p>
+                Mined in 24h:
+                <span class="fw-bold">1389</span> blocks |
+                <span class="fw-bold">11,254</span> coins
+            </p>
+            <p>
+                Block Reward:
+                <span class="fw-bold">8 EPIC</span>
+            </p>
+            <p>
+                Block Value:
+                <span class="fw-bold">3.87 USD</span>
+            </p>
+            <p>
+                Halving Height:
+                <span class="fw-bold">1,157,760</span>
+                <span class="badge bg-primary">
+                    approx. 22 NOVEMBER 2021
+                </span>
+            </p>
+        </div>
+
+
+    </div>
+</div>

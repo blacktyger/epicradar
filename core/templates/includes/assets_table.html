@@ -1,0 +1,126 @@
+{% load static %} {% load humanize %} {% load math %}
+<head>
+    <style>
+        a {
+            color: #201E20;
+            text-decoration: none;
+            font-weight: bold;
+            background-color: transparent;
+            -webkit-text-decoration-skip: objects; }
+        a:hover {
+          color: #201E20;
+          text-decoration: underline;
+        }
+        a:visited {color: #201E20;}
+    </style>
+</head>
+
+<div class="card">
+    <div class="card-header card-header-primary card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">assignment</i>
+        </div>
+        <h3 class="card-title">Epic-Cash Assets</h3>
+    </div>
+    <div class="card-body">
+        <table class="table table-responsive text-center
+               table-bordeless align-middle" width="100%" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Chain</th>
+                    <th>Pair</th>
+                    <th>Change 24h</th>
+                    <th colspan="2">Price</th>
+                    <th>Volume 24h</th>
+                    <th>Liquidity</th>
+                    <th>Price 7d</th>
+                </tr>
+            </thead>
+            <tbody class="fs-6 text-end">
+
+<!--                        VITEX DATA-->
+                {% with assets_table.vitex as v %}
+                <tr>
+                    <td class="fs-6 text-start">
+                        <a target="_blank" href="{{v.chain_link}}">Vite</a>
+                    </td>
+                    <td>
+                        <a target="_blank" href="{{v.trade_link}}">EPIC/BTC</a>
+                    </td>
+                    <td class="text-{{v.change.color}}">
+                        {{v.change.arrow|safe}}
+                        {{v.change.value|floatformat:1}}%
+                    </td>
+                    <td>${{v.price_usd|floatformat:2}}</td>
+                    <td>{{v.price_quota|floatformat:8}}</td>
+                    <td>{{v.volume|floatformat:0|intcomma}}</td>
+                    <td>${{v.liquidity|floatformat:0|intcomma}}</td>
+                    <td>
+                        {% for js in v.chart %}
+                            {{ js|safe }}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+<!--                    STELLAR DATA-->
+                {% with assets_table.stellar as v %}
+                <tr>
+                    <td class="fs-6 text-start">
+                        <a target="_blank" href="{{v.chain_link}}">Stellar</a>
+                    </td>
+                    <td>
+                        <a target="_blank" href="{{v.trade_link}}">EPIC/XLM</a>
+                    </td>
+                    <td class="text-{{v.change.color}}">
+                        {{v.change.arrow|safe}}
+                        {{v.change.value|floatformat:1}}%
+                    </td>
+                    <td>${{v.price_usd|floatformat:2}}</td>
+                    <td>{{v.price_quota|floatformat:2}}</td>
+                    <td>{{v.volume|floatformat:0|intcomma}}</td>
+                    <td>${{v.liquidity|floatformat:0|intcomma}}</td>
+                    <td>
+                        {% for js in v.chart %}
+                            {{ js|safe }}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+<!--                    PANCAKE DATA-->
+                {% with assets_table.pancake as v %}
+                <tr>
+                    <td class="fs-6 text-start">
+                        <a target="_blank" href="{{v.chain_link}}">Binance</a>
+                    </td>
+                    <td>
+                        <a target="_blank" href="{{v.trade_link}}">EPIC/BNB</a>
+                    </td>
+                    <td class="text-{{v.change.color}}">
+                        {{v.change.arrow|safe}}
+                        {{v.change.value|floatformat:1}}%
+                    </td>
+                    <td>${{v.price_usd|floatformat:2}}</td>
+                    <td>{{v.price_quota|floatformat:5}}</td>
+                    <td>{{v.volume|floatformat:0|intcomma}}</td>
+                    <td>${{v.liquidity|floatformat:0|intcomma}}</td>
+                    <td>
+                        {% for js in v.chart %}
+                            {{ js|safe }}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endwith %}
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer px-2 text-muted text-center comment">
+        *{{text.eng.asset_table_comment}}
+    </div>
+</div>
+
+
+{% block javascripts %}
+
+{% endblock javascripts %}

@@ -1,0 +1,23 @@
+{% extends "layouts/base-auth.html" %} {% load static %}
+
+{% block title %} Register {% endblock title %}
+
+{% block content %}
+
+  <div class="page-header register-page header-filter" filter-color="black" style="background-image: url('/static/assets/img/register.jpg')">
+
+      {% include 'includes/register_form.html' %}
+
+  </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+
+  <script>
+    $(document).ready(function() {
+      md.checkFullPageBackgroundImage();
+    });
+  </script>
+  
+{% endblock javascripts %}

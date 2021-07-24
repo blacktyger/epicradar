@@ -1,0 +1,243 @@
+{% extends "layouts/base.html" %} {% load humanize %} {% load static %} {% load math %}
+
+{% block title %} Wallet app {% endblock title %}
+
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <h3>{{message}}</h3>
+    {% endfor %}
+{% endif %}
+
+<style>
+
+.epic_hide {
+    display: none;
+}
+
+</style>
+
+
+<div class="row d-flex justify-content-center">
+    <div class="col-xl-5 col-lg-6 col-md-10 col-sm-10 text-center">
+        <!--        EPIC LOGO -->
+        <img class="img px-1 py-1 mb-4" src="{% static 'logos/epic.png' %}" alt="" height="120">
+
+        <div class="card card-stats">
+            <div class="card-header card-header-rose card-header-icon">
+
+            <!--        USER PIC -->
+                <div class="card-icon">
+                    <img class="rounded" src="/static/assets/img/faces/avatar.jpg" width="100">
+                </div>
+
+                <p class="card-category mb-3"><span class="h3">{{user.username}}'s wallet</span></p>
+                <h2 class="card-category text-dark">
+                    <span id="user_balance_text" class="h2">
+                        {{ecb.user_wallet.0.balance.normalize|floatformat:2 }} EPIC
+                    </span>
+                </h2>
+                <span id="user_locked_text" class="h5 card-category text-warning">
+                    {% if ecb.user_wallet.0.locked > 0 %}
+                        Locked: {{ ecb.user_wallet.0.locked.normalize|floatformat:2 }}
+                    {% endif %}
+                </span>
+                <span id="user_pending_text" class="h5 card-category text-success">
+                    {% if ecb.user_wallet.0.pending > 0 %}
+                        Pending: {{ ecb.user_wallet.0.pending.normalize|floatformat:2 }}
+                    {% endif %}
+                </span>
+            </div>
+            <div class="card-footer"></div>
+
+            <!--  PERSONAL TABS           -->
+            <div class="page-categories px-3">
+                <ul class="nav nav-pills nav-pills-rose nav-pills-icons justify-content-center py-1"
+                    role="tablist" >
+                    <li class="nav-item ">
+                        <a class="nav-link active" data-toggle="tab" href="#wallet_tab_send" role="tablist">
+                            <i class="material-icons">send</i> SEND
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#wallet_tab_transactions" role="tablist">
+                            <i class="material-icons">history</i> Transactions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#wallet_tab_deposit" role="tablist">
+                            <i class="material-icons">savings</i> Deposit
+                        </a>
+                    </li>
+                </ul>
+
+                <!--        MESSAGES -->
+                <div id="message_box" class="alert text-center mt-1 col-lg-8">
+                    <span id="message_text"></span>
+                </div>
+                <div class="tab-content tab-space tab-subcategories px-5">
+
+                    <!--       PERSONAL SEND TAB        -->
+                    <div class="tab-pane active" id="wallet_tab_send">
+                        <div class="text-center">
+                            <span class="h4">
+                                Send Epic-Cash to other Telegram users
+                                <br>
+                                Use <span class="text-info font-weight-bold">@Username</span> as address.
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <form class="form" method="POST" id="ecb_transaction_send_form">
+                                {% csrf_token %}
+                                <div class="row justify-content-center mt-4">
+                                    <div class="col-sm-10">
+                                        <label class="pull-left" id="receive_method_text" >
+                                            Recipient address:
+                                        </label>
+                                        {{ecb.transaction_form.recipient }}
+                                    </div>
+                                </div>
+
+                                <div class="row justify-content-center mt-4">
+                                    <div class="col-sm-10">
+                                        <label class="pull-left">Amount:</label>
+                                        {{ecb.transaction_form.amount }}
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center mt-2">
+                                    <button type='submit' class="btn btn-success btn-block w-75 mt-5">
+                                        <span class="btn-label">
+                                            <i class="material-icons">check</i></span>
+                                            SEND
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--     PERSONAL TRANSACTIONS      -->
+                    <div class="tab-pane" id="wallet_tab_transactions">
+
+                    <p class="h4"><span class="material-icons text-warning">done</span> - Pending transaction</p>
+                    <p class="h4"><span class="material-icons text-success">done_all</span> - Completed transaction </p>
+
+                        <div class="card">
+                            <div class="card-header card-header-warning card-header-icon">
+                                <div class="card-icon">
+                                    <i class="material-icons">date_range</i>
+                                </div>
+                                <p class="card-category">Last transactions</p>
+                            </div>
+                            <div class="card-body table-responsive text-center">
+                                <table class="table table-hover">
+                                    <tbody>
+                                    {% for tx in ecb.user_wallet_transactions.0 %}
+                                        <tr>
+                                            {% if tx.status != 'canceled' %}
+                                                {% if tx.status == 'mempool' %}
+                                                    <td><span class="material-icons text-warning">done</span></td>
+                                                {% elif tx.status == 'completed' %}
+                                                    <td><span class="material-icons text-success">done_all</span></td>
+                                                {% endif %}
+
+                                                {% if tx.sender == ecb.user_wallet.0 %}
+                                                    <td>{{tx.time|date:'d/m/Y H:i'}}</td>
+                                                    <td>to  {{tx.recipient.owner.username}}</td>
+                                                    <td><span class="text-danger font-weight-bold">
+                                                        -{{tx.amount|floatformat:2}}</span>
+                                                    </td>
+                                                {% else %}
+                                                    <td>{{tx.time|date:'d/m/Y H:i'}}</td>
+                                                    <td>from {{tx.sender.owner.username}}</td>
+                                                    <td><span class="text-success font-weight-bold">
+                                                        {{tx.amount|floatformat:2}}</span></td>
+                                                {% endif %}
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="wallet_tab_deposit">
+                        <div class="h3 mb-4">
+                            DEPOSITS ARE NOT POSSIBLE YET
+                            <i class="material-icons text-warning">build</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block javascripts %}
+<script>
+    var send_method = 'telegram'
+
+    function toggleHide(elem_id, kill=0) {
+        console.log('Clicked' + elem_id);
+        $(elem_id).fadeToggle(700);
+
+        console.log(kill)
+        if (kill !== 0) {
+            console.log('kill trigger')
+            $(kill).addClass('epic_hide');
+        };
+    };
+
+    $('#receive_wallet_button').click(function() {
+        send_method = 'address';
+        $(this).prop('active', 'true');
+        $('#receive_method_text').text("Recipient wallet address:");
+    });
+
+    $('#receive_telegram_button').click(function() {
+        send_method = 'telegram';
+        $(this).prop('active', 'true');
+        $('#receive_method_text').text("Recipient telegram username:");
+    });
+
+$(document).on('submit', '#ecb_transaction_send_form',function(e){
+    console.log('YAY!')
+    e.preventDefault();
+    // SPINNER ON
+    $('#loader').removeClass('hidden');
+
+    var csrf = $('input[name=csrfmiddlewaretoken]').val();
+    $.ajax({
+        type:'POST',
+        url:'{% url "personal-wallet" %}',
+        data:{
+            send_method:send_method,
+            amount:$('#ecb_amount_form').val(),
+            recipient:$('#ecb_recipient_form').val(),
+            sender:'{{ request.user }}',
+            csrfmiddlewaretoken: csrf
+        },
+        success:function(data) {
+            $('#message_box').attr('class', 'mt-3 text-center alert alert-' + data.status)
+            $('#message_text').text(data.message);
+            if (data.transaction) {
+                $('#transactions_tab').addClass('active');
+                $('#send_tab').removeClass('active');
+                $('#ecb_amount_form').val('');
+                $('#user_balance_text').text(data.balance + ' EPIC');
+                $('#user_locked_text').text('Locked: ' + data.locked);
+            };
+<!--            $('#ecb_recipient_form').val('');-->
+            console.log(data.signature);
+            $('#loader').addClass('hidden');
+        }
+    })
+});
+
+</script>
+{% endblock javascripts %}
+

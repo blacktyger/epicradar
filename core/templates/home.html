@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %} {% load static %} {% load humanize %} {% load math %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+
+
+{% block content %}
+<style>
+    .comment {
+        display: none!important;
+    }
+</style>
+{% load static %} {% load humanize %} {% load math %}
+
+<!--<div class="row my-1">-->
+<!--    <p class="fs-5 text-muted">-->
+<!--        {{text.eng.top_warning}}-->
+<!--        {{updated|date:"d/m/y h:m:s T"}}-->
+<!--    </p>-->
+<!--    <p class="mt-3 comment">-->
+<!--        *{{text.eng.top_comments_status}} On-->
+<!--    </p>-->
+<!--    <hr class="py-1" />-->
+<!--    <div class="col-lg-8 col-md-6 col-xs-12 my-3">-->
+<!--        {{text.eng.top_header_text|safe}}-->
+<!--    </div>-->
+<!--    <div class="col-lg-4 col-md-6 col-xs-12">-->
+<!--        {% include 'includes/epicentral_wallet.html' %}-->
+<!--    </div>-->
+<!--</div>-->
+
+<div class="row">
+    {% include 'includes/top_cards.html' %}
+</div>
+
+<div class="row">
+    <div class="col-xl-8 col-lg-12">
+        {% include 'includes/assets_table.html' %}
+    </div>
+    <div class="col-xl-4 col-lg-12">
+        {% include 'includes/stats_card.html' %}
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/2.3.1/bokeh.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/2.0.1/bokeh-widgets.min.js"></script> -->
+<!-- Vector Map plugin, full documentation here: http://jvectormap.com/documentation/ -->
+<script src="{% static 'assets/js/plugins/jquery-jvectormap.js' %}"></script>
+
+<script>
+        $(document).ready(function() {
+        // Javascript method's body can be found in assets/js/demos.js
+        md.initDashboardPageCharts();
+
+        md.initVectorMap();
+
+        });
+    </script>
+{% endblock javascripts %}

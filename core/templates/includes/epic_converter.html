@@ -1,0 +1,116 @@
+
+<!--CONVERT EPIC <-> CURRENCY WITH AJAX CALL-->
+
+<div class="row d-flex align-items-center justify-content-center px-5 mb-4">
+    <div class="col-md-5 col-sm-8">
+        <label class="" for="input_base">EPIC</label>
+        <input style="font-size: 1.2rem;" type="number" id="input_base" value="10" class="form-control" placeholder="Epic-Cash amount">
+    </div>
+    <div class="col-md-1 col-sm-1 d-md-none text-center mt-4">
+        <span class="material-icons" style="font-size: 1.2rem;">swap_vert</span>
+    </div>
+    <div class="col-md-1 col-sm-1 d-none d-md-block">
+        <span class="material-icons" style="font-size: 1.2rem;">swap_horiz</span>
+    </div>
+    <div class="col-md-5 col-sm-8">
+        <label for="input_currency" class="d-none d-md-block pull-right mr-3">USD</label>
+        <label for="input_currency" class="d-md-none">USD</label>
+        <input style="font-size: 1.2rem;" type="number" id="input_currency" class="form-control d-md-none" placeholder="USD amount">
+        <input style="font-size: 1.2rem;" type="number" id="input_currency2" class="form-control d-none d-md-block text-right" placeholder="USD amount">
+    </div>
+</div>
+
+
+<script>
+   $(document).ready(function() {
+        update_base()
+   });
+
+    function update_base () {
+        currency = $('#select_currency').val(),
+        base = $('#select_base').val(),
+        $.ajax({
+            type: "GET",
+            url: '{% url "epic_to_currency" %}',
+            data : {
+                 currency:currency,
+                 base:base,
+                },
+                success:function(data) {
+                    console.log(data);
+                    var amount = $('#input_base').val();
+                    if (data.currency === "BTC") {
+                        price = (amount * data.value).toFixed(8);
+                    } else {
+                        price = (amount * data.value).toFixed(2);
+                        };
+                    $('#input_currency').val(price);
+                    $('#input_currency2').val(price);
+                },
+            });
+    };
+
+    function update_currency () {
+        currency = $('#select_currency').val(),
+
+        base = $('#select_base').val(),
+        $.ajax({
+            type: "GET",
+            url: '{% url "epic_to_currency" %}',
+            data : {
+                 currency:currency,
+                 base:base,
+                },
+                success:function(data) {
+                    console.log(data);
+                    var amount = $('#input_currency').val();
+                    price = (amount / data.value).toFixed(2);
+                    $('#input_base').val(price);
+                },
+        });
+    };
+
+        function update_currency2 () {
+        currency = $('#select_currency').val(),
+
+        base = $('#select_base').val(),
+        $.ajax({
+            type: "GET",
+            url: '{% url "epic_to_currency" %}',
+            data : {
+                 currency:currency,
+                 base:base,
+                },
+                success:function(data) {
+                    console.log(data);
+                    var amount = $('#input_currency2').val();
+                    price = (amount / data.value).toFixed(2);
+                    $('#input_base').val(price);
+                },
+        });
+    };
+
+    $('#select_currency').on('change', function() {
+        currency = $(this).val()
+        console.log(currency)
+    });
+
+    $('#select_currency').on('change', function() {
+        base = $(this).val()
+        update_base()
+        console.log(base)
+    });
+
+    $('#input_currency').keyup(function () {
+        update_currency()
+    });
+
+    $('#input_currency2').keyup(function () {
+        update_currency2()
+    });
+
+    $('#input_base').keyup(function () {
+        update_base()
+    });
+</script>
+

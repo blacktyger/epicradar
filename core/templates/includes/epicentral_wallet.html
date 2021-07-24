@@ -1,0 +1,37 @@
+{% load static %} {% load humanize %} {% load math %}
+
+<div class="card card-stats">
+    <div class="card-header card-header-info card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">account_balance_wallet</i>
+        </div>
+        <p class="card-category">test-epicentral wallet balance</p>
+        <div id="accordion" role="tablist">
+            <div class="card-collapse mt-3">
+                <div role="tab" id="headingOne">
+                    <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+                        <span class="h2 text-dark">{{balances.total.normalize}} EPIC</span>
+                        <span class="h3 text-dark"><i class="material-icons">keyboard_arrow_down</i></span>
+                    </a>
+                    <span class="text-dark">~{{balances.total|multi:epic_vs_usd|floatformat:2}} USD</span>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="collapse hide" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion" style="">
+                    <div class="card-body">
+                        <table class="table table-borderless fs-6">
+                            <tbody>
+                                <tr><td class="text-start">Waiting Confirmation</td><td>{{balances.wait_conf}}</td></tr>
+                                <tr><td class="text-start">Waiting Finalization</td><td>{{balances.wait_final}}</td></tr>
+                                <tr><td class="text-start">Locked</td><td>{{balances.locked}}</td></tr>
+                                <tr><td class="text-start">Spendable</td><td>{{balances.spendable}}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer px-2 text-muted text-center comment">
+        *{{text.eng.wallet_comment}}
+    </div>
+</div>

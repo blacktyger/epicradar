@@ -1,0 +1,311 @@
+{% extends 'layouts/base.html' %} {% load qr_code %} {% load static %}
+
+{% block stylesheets %}
+    <link href="/static/assets/css/swapic.css" rel="stylesheet" />
+{% endblock stylesheets %}
+
+
+{% block content %}
+    <div class="row d-flex justify-content-start align-items-center">
+        <div class="card py-3 px-5 widget rounding text-center">
+
+    <!--    LOGO AND HELP SECTION -->
+            <div class="form-group d-flex justify-content-start align-items-stretch mb-3">
+                <div class="col-sm-6">
+                    <img class="" src="{% static 'logos/swapic-logo-200px.png' %}">
+                </div>
+                <div class="col-sm-6 mt-3 text-right">
+                    <a href="/" class="">
+                        <span style="font-size: 1.7rem;" class="text-white material-icons">
+                            help_outline
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <form method="POST" class="" id="stellar_trader">
+            {% csrf_token %}
+
+    <!--        BUY SECTION -->
+                <div class="form-group d-flex justify-content-center align-items-stretch mb-3">
+                    <label for="buy" class="m-3">Buy</label>
+                    <div class="col-sm-8 input_frame_left rounding-left input-border py-3">
+                        <input type="number" autocomplete="off" step="0.00000001"
+                               class="form-control amount_input mt-2" id="buy"
+                               name="buy" placeholder="0.0">
+                    </div>
+                    <div class="col-sm-4 input_frame_right rounding-right input-border py-3">
+                        <select id="token" class="custom-select">
+                          <option value="epic" selected>EPIC</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <span class="material-icons">south</span>
+                </div>
+
+    <!--        SPEND SECTION -->
+                <div class="form-group d-flex justify-content-center align-items-stretch mt-3">
+                    <label for="spend" class="m-3">Pay</label>
+                    <div class="col-sm-8 input_frame_left rounding-left input-border py-3">
+                        <input type="number" autocomplete="off" step="0.00000001"
+                               class="form-control amount_input mt-2" id="spend"
+                               name="spend" placeholder="0.0">
+                    </div>
+                    <div class="col-sm-4 input_frame_right rounding-right input-border py-3">
+                        <select class="custom-select" id="currency">
+                            <option selected value="USD">XLM</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+    <!--    SWAP BUTTON -->
+            <div class="col-sm-12 text-center d-flex justify-content-center">
+                <button type="submit" id="buy_button" class="py-3 btn rounding w-100 mt-2">
+                    <span class="h4 font-weight-bold" id="swap_button_text"></span>
+                </button>
+            </div>
+    <!--    CONTINUE BUTTON -->
+    <!--        <div class="stellar_continue_button text-center my-4">-->
+    <!--            <button type="submit" id="stellar_continue_button"-->
+    <!--                    class="btn mt-4 btn-lg btn-warning btn-block btn-info"-->
+    <!--                    onclick="toggleHide('#receive_page', '#stellar_continue_button')">-->
+    <!--                Continue-->
+    <!--            </button>-->
+    <!--        </div>-->
+
+    <!--    MESSAGES -->
+    <!--        <div id="message_box" class="message_box alert text-center">-->
+    <!--            <span id="message_text"></span>-->
+    <!--        </div>-->
+        </div>
+    </div>
+
+    <!-- STELLAR RESULT TABLE-->
+    <div class="row d-flex mt-0 result_widget justify-content-center align-items-center">
+        <div class="col-sm-11 mx-3 mr-1 mt-0 card bg-dark py-3 epic_hide" id="result_screen_1">
+            <div class="table-responsive" id="stellar_result_table">
+                <table class="table text-white">
+                    <thead class="mb-3" id="stellar_result_header">
+                        <tr class="">
+                            <th style="font-size: 1.3rem;">Buy
+                                <i class="ml-2 mdi mdi-information-outline text-light"></i><br>
+                                <span id="result_buy_text"class="text-muted mt-2" style="font-size: 0.8rem;">
+                                    estimated
+                                </span>
+                            </th>
+                            <th colspan="2" style="font-size: 1.3rem;" class="text-right">
+                                <span class="text-warning" id="result_buy"></span><br>
+                                <span id="result_buy_limit"class="text-muted mt-2" style="font-size: 0.8rem;">
+                                </span>
+                            </th>
+                        </tr>
+                        <tr class="">
+                            <th style="font-size: 1.2rem;">Pay
+                                <i class="ml-2 mdi mdi-information-outline text-light"></i><br>
+                                <span id="result_pay_text"class="text-muted mt-2" style="font-size: 0.8rem;">
+                                    exact amount
+                                </span>
+                            </th>
+                            <th colspan="2" style="font-size: 1.2rem;"
+                                class="text-right text-info">
+                                <span id="result_pay"></span><br>
+                                <span id="result_pay_usd"class="text-muted mt-2" style="font-size: 0.8rem;"></span>
+                            </th>
+                        </tr>
+                        <tr class="">
+                            <th style="font-size: 1.2rem;">Price
+                            <i class="ml-2 mdi mdi-information-outline text-light"></i><br>
+                                <span id="resultprice_text"class="text-muted mt-2" style="font-size: 0.8rem;">
+                                   average per 1 EPIC
+                                </span>
+                            </th>
+                            <th colspan="2" style="font-size: 1.2rem;"
+                                class="text-right text-info">
+                                <span id="result_price"></span><br>
+                                <span id="result_price_usd"class="text-muted mt-2" style="font-size: 0.8rem;"></span>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+
+
+                <!-- STELLAR DETAIL TABLE-->
+                <div class="table-responsive epic_hide my-3" id="details_table">
+                    <table class="table text-white">
+                        <tbody id="stellar_result_body" style="font-size: 1rem;">
+                            <tr class="tr_start">
+                                <td class="td11"></td>
+                                <td class="td12"></td>
+                                <td class="td13"></td>
+                            </tr>
+                            <tr class="tr_average">
+                                <td class="td21"></td>
+                                <td class="td22"></td>
+                                <td class="td23"></td>
+                            </tr>
+                            <tr class="tr_after">
+                                <td class="td31"></td>
+                                <td class="td32"></td>
+                                <td class="td33"></td>
+                            </tr>
+                            <tr class="tr_total">
+                                <td class="td41"></td>
+                                <td class="td42"></td>
+                                <td class="td43"></td>
+                            </tr>
+                            <tr class="tr_impact">
+                                <td class="td51"></td>
+                                <td class="td52">
+                                    <div class="progress">
+                                        <div class="progress-bar price_impact_bar bg-info" id="price_impact_bar"
+                                             role="progressbar" style="width: 10%" aria-valuenow="10"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="td53"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="text-right">
+                <button type="submit" class="btn btn-sm mr-3 btn-outline-info my-2"
+                        id="details_button" >
+                    More details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!--    RECEIVE METHOD SCREEN-->
+    <div class="row d-flex mt-0 result_widget justify-content-center align-items-center">
+        <div class="col-sm-11 mx-3 mt-0 card bg-dark epic_hide" id="receive_method_screen">
+            <div class="card-body" id="receive_page" style="font-size: 1.2rem;">
+                <div class="row mb-2 d-flex align-items-center justify-content-center" >
+                    <div class="mt-2">Where to send EPIC</div>
+                </div>
+                <div class="form-row my-2 d-flex align-items-center justify-content-center">
+                    <div class="form-row my-2 d-flex justify-content-center">
+                        <div class="col-xs-6">
+                            <button class="btn btn-primary"  id="receive_wallet_button">
+                               GUI wallet address</button>
+                        </div>
+                        <div class="col-xs-6">
+                            <button class="btn btn-rose" id="receive_keybase_button">
+                                Keybase address</button>
+                        </div>
+                    </div>
+                </div>
+                <form method="POST" id="receive_confirm" class="forms-sample">
+                    {% csrf_token %}
+                    <div class="input-group-append" id="stellar_receive_input">
+                        <div class="input-group-text text-white mr-2" id="receive_method_text">
+                            GUI Wallet:
+                        </div>
+                        <input type="text" id="receive_input" class="text-white form-control"
+                               placeholder="" required>
+                        <div class="input-group-prepend">
+                            <div class="btn btn-sm btn-info mx-1" id="receive_help_button" onclick="toggleHide('#receive_help_text')">
+                                <span class="material-icons">help</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="receive_help_text" class="mt-4 ml-2 epic_hide" style="font-size: 0.8rem;">
+                        Provide Epic-Cash wallet address registered in
+                        <a href="https://github.com/fastepic/epicwallet">
+                            Epic-Cash GUI wallet </a>, or Keybase.io username.
+                        <p class="text-right"> <a href="#" class="text-muted">More information</a></p>
+                    </div>
+                    <button type="submit" id="confirm_buy_button" class="btn mt-4 btn-lg btn-block btn-warning">
+                        CONFIRM
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--SEND PAGE-->
+    <div class="card-body epic_hide" id="send_page" style="font-size: 1.2rem;background-color: rgba(0, 0, 0, 0.13);">
+        <div class="row d-flex align-items-center justify-content-center">
+            <div class="col-sm-6 mb-3 text-center">
+
+    <!--        TIMER -->
+                <div class="col-sm-12 mb-3">
+                    <p class="h4 text-muted">
+                        send XLM in 5 min
+                    </p>
+                        {% include 'includes/timer.html' %}
+                </div>
+
+    <!--        QR CODE -->
+                <img src="{% qr_url_from_text send_xlm_address size=4 version=4 image_format='png' %}">
+            </div>
+            <div class="col-sm-12">
+                <div class="table-responsive" id="stellar_send_table">
+                    <table class="table text-secondary">
+                        <thead class="mb-3" id="stellar_send_header">
+                            <tr class="">
+                                <th style="font-size: 0.9rem;">
+                                    <p>STELLAR ADDRESS:</p>
+                                    <span id="send_address" class="text-right text-warning"></span>
+                                </th>
+                            </tr>
+                            <tr class="">
+                                <th style="font-size: 0.9rem;">
+                                    <p>SEND AMOUNT:</p>
+                                    <span id="send_amount" class="text-right text-warning"></span>
+                                </th>
+                            </tr>
+                            <tr class="">
+                                <th style="font-size: 0.9rem;">
+                                    <p>MEMO:</p>
+                                    <span id="send_memo" class="text-right text-warning"></span>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <button type="submit" id="confirm_send_button" class="btn mt-4 btn-lg btn-block btn-info">
+                    CLICK WHEN DONE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body epic_hide" id="summary_page">
+        <div class="col text-center mt-3">
+            <span id="loading_text"></span>
+
+        </div>
+    </div>
+
+    <div class="row epic_hide">
+        <div class="card w-100">
+            <div class="">
+                <label for="text_1" class="mt-4">
+                    Or generate new wallet and key's pair
+                </label>
+                <div class="input-group-append mt-2">
+                    <button id="text_1">assda</button>
+                </div>
+            </div>
+        </div>
+        <div class="" id="keys_table">
+            <button class="btn btn-info" id="generate_key_btn">Generate</button>
+            <div class="epic_hide_text private_key my-2"></div>
+            <div class="epic_hide_text public_key my-2"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="/static/assets/js/swapic/swapic.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+                crossorigin="anonymous"></script>
+{% endblock javascripts %}

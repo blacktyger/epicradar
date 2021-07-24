@@ -1,0 +1,86 @@
+{% load static %} {% load humanize %} {% load math %}
+
+<div class="row">
+    <!--    VITEX CHART -->
+    <div class="col-md-6">
+        <div class="card card-chart">
+            <div class="card-header card-header-info"
+            style="background: linear-gradient(284deg, rgba(50,159,200,1) 2%, rgba(90,148,230,1) 89%);">
+                <div class="row d-flex align-items-center">
+                    <div class="col-xs-auto mx-3">
+                        <img src="{% static 'logos/vitex.png' %}">
+                    </div>
+                    <div class="col-xs-6">
+                        <span class="h3">EPIC-BTC PRICE</span><br>
+                        <span class="text-white">1 EPIC = {{vitex.closePrice}} BTC</span>
+                    </div>
+                </div>
+                <div class="bokeh_chart">
+                    {% for js in vitex_chart %}
+                        {{ js|safe }}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-sm-12 col-xs-12 col-lg-12">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row d-flex align-items-center px-3">
+                    <i class="material-icons mr-3">exit_to_app</i>
+                    <a href="https://x.vite.net/trade?symbol=EPIC-002_BTC-000"
+                    target="_blank" class="text-dark">
+                        Trade EPIC-BTC on vitex.net
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--    STELLAR CHART -->
+    <div class="col-md-6">
+        <div class="card card-chart">
+            <div class="card-header card-header-info"
+            style="background: linear-gradient(180deg, rgba(75,68,83,1) 2%, rgba(96,133,185,1) 89%);">
+                <div class="row d-flex align-items-center">
+                    <div class="col-xs-auto mx-3">
+                        <img src="{% static 'logos/stellar_logo.png' %}">
+                    </div>
+                    <div class="col-xs-6">
+                        <span class="h3">EPIC-XLM PRICE</span><br>
+                        <span class="text-white">1 EPIC = {{xlm_price|floatformat:2}} XLM</span>
+                    </div>
+                </div>
+                <div class="bokeh_chart">
+                    {% for js in stellar_chart %}
+                        {{ js|safe }}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-sm-12 col-xs-12 col-lg-12">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row d-flex align-items-center px-3">
+                    <i class="material-icons mr-3">exit_to_app</i>
+
+                    <a href="https://www.stellarx.com/markets/EPIC:GD4YEDHMQK2HD7DMKAG554JK4TVOTQNPWTKR2KHL5UCSJ6ART2UA2E32"
+                    target="_blank" class="text-dark">
+                        Trade EPIC-XLM on stellarx.com
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
