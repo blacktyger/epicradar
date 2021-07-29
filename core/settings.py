@@ -17,9 +17,10 @@ SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+
 if DEBUG:
     import mimetypes
-
     mimetypes.add_type("application/javascript", ".js", True)
 
 # load production server from .env
@@ -36,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_extensions',
     'rest_framework',
-    'background_task',
     'debug_toolbar',
     # 'qr_code',
     # 'wallet',

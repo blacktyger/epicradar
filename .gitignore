@@ -15,6 +15,7 @@ env
 venv
 
 # other
+
 .DS_Store
 
 # javascript
@@ -24,3 +25,5 @@ staticfiles/*
 !staticfiles/.gitkeep 
 .vscode/symbols.json
 /core/secrets.py
+/core/settings.py
+
