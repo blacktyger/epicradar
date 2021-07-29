@@ -11,7 +11,7 @@ import numpy
 
 def vitex_price(data):
     df = pd.DataFrame(data)
-    x_start = [t_s(x) for x in df.t if sort_by_date(x, days=7)]
+    x_start = [t_s(x) for x in df.t if sort_by_date(x, days=4)]
     df['t'] = [t_s(d) for d in df['t']]
 
     df['adj_v'] = df.v / 2

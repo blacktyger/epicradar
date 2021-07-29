@@ -1,3 +1,5 @@
+import json
+
 from .forms import MiningCalculatorForm
 from django.http import JsonResponse
 from django.views import generic
@@ -31,7 +33,9 @@ class MiningView(generic.TemplateView):
         context['currency_list'] = [x.symbol for x in db.data['currency'] if x.symbol != 'XXX']
         context['algo_list'] = app.algos
         context['calc_form'] = MiningCalculatorForm()
-        context['network'] = db.data['network']
+        context['network'] = {'height': db.data['network'].height,
+                              'hash': json.loads(db.data['network'].hash),
+                              'diff': json.loads(db.data['network'].diff)},
         context['periods'] = self.periods
         context['segment'] = 'mining'
 

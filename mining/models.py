@@ -53,6 +53,11 @@ class Pool(models.Model):
 
     def workers_count(self):
         obj = Pool.objects.get(id=self.id).stats.last()
+        if not obj:
+            PoolManager.init_data()
+            PoolManager()._data()
+            obj = Pool.objects.get(id=self.id).stats.last()
+
         obj_data = json.loads(obj.data)['stats']['stats']
         workers_count = 0
         if obj.pool.name == 'icemining':

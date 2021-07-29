@@ -27,3 +27,4 @@ staticfiles/*
 /core/secrets.py
 /core/settings.py
 
+/app/jobs/

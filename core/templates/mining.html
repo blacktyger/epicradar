@@ -70,7 +70,7 @@
                              <thead>
                                  <th class="text-muted text-start">
                                      <span class="text-success">●</span>
-                                     Height: {{network.height|intcomma}}
+                                     Height: {{network.0.height|intcomma}}
                                  </th>
                                  <th class="text-center">
                                      RandomX
@@ -86,25 +86,25 @@
                                 <tr>
                                     <td class="text-left">Network Difficulty</td>
                                     <td class="text-right fs-6 font-weight-bold">
-                                        {{network.diff.randomx|intcomma}}
+                                        {{network.0.diff.randomx|intcomma}}
                                     </td>
                                     <td class="text-right fs-6 font-weight-bold">
-                                        {{network.diff.progpow|intcomma}}
+                                        {{network.0.diff.progpow|intcomma}}
                                     </td>
                                     <td class="text-right fs-6 font-weight-bold">
-                                        {{network.diff.cuckatoo|intcomma}}
+                                        {{network.0.diff.cuckatoo|intcomma}}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="text-left">Network Hashrate</td>
                                     <td class="text-right fs-6 font-weight-bold">
-                                        {{network.hash.randomx|intcomma}}
+                                        {{network.0.hash.randomx|intcomma}}
                                     </td>
                                     <td class="text-right fs-6 font-weight-bold">
-                                        {{network.hash.progpow|intcomma}}
+                                        {{network.0.hash.progpow|intcomma}}
                                     </td>
                                     <td class="text-right fs-6 font-weight-bold">
-                                        {{network.hash.cuckatoo|intcomma}}
+                                        {{network.0.hash.cuckatoo|intcomma}}
                                     </td>
                                 </tr>
                             </tbody>
