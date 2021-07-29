@@ -99,7 +99,7 @@ class NetworkCalculator:
             # If script height is same as network height (normal)
             if self.height == data['height']:
                 # print(f"No new blocks, height: {self.height}")
-                time.sleep(3)
+                time.sleep(5)
 
             # If script height is higher than network height (error)
             elif self.height > data['height']:
@@ -112,28 +112,19 @@ class NetworkCalculator:
                 self.height = data['height']
                 self.prev_total_diffs = self.last_total_diffs
                 self.last_total_diffs = data
-                # try:
+
                 self.current_diffs = self.calculate_current_network_diff()
                 self.network_hashrate = self.calculate_current_network_hashrate()
                 self.save_to_csv()
-                print(f"{self.height} saved to db!")
-                # except:
-                #     print(f"{self.height} errors, NOT saved to db!")
-                #     continue
-
-                print(f"---- DIFFICULTY ----")
-                print(self.current_diffs)
-                print(f"---- HASHRATE ----")
-                print(self.network_hashrate)
+                print(f"✅ {self.height} node data saved to csv!")
+                # print(f"---- DIFFICULTY ----")
+                # print(self.current_diffs)
+                # print(f"---- HASHRATE ----")
+                # print(self.network_hashrate)
 
             # If script height is lower than network more than 1 (problem)
             elif self.height < data['height'] - 1:
-                # self.last_total_diffs = data
                 self.prev_total_diffs = data
                 self.height = data['height']
                 print(f"Stored height is way behind network - restart at height: {self.height}")
 
-#
-# x = NetworkCalculator(node_url="https://epicradar.tech/node/v1/status")
-#
-# x.update()

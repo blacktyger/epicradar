@@ -2,9 +2,9 @@ from core.manager.epic_wallet import WalletManager
 from ecb.models import Transaction, Wallet
 from django.views.generic.base import TemplateView
 from authentication.forms import SignUpForm
-from ecb.views import blockchain
+# from ecb.views import blockchain
 from .forms import TransactionForm
-from core.db import db
+from app.models import db
 from .models import *
 
 
@@ -30,7 +30,7 @@ class WalletHomeView(TemplateView):
         context['ecb'] = {
             'transaction_form': TransactionForm(),
             'transactions': Transaction.objects.filter(status='completed'),
-            'coinbase': blockchain.coinbase,
+            # 'coinbase': blockchain.coinbase,
             'wallets': Wallet.objects.all(),
             'volume': sum(tx.amount for tx in Transaction.objects.filter(status='completed'))
             }

@@ -1,4 +1,4 @@
-from core.db import db
+from app.models import db
 
 
 def check_impact(price_before, price_after):

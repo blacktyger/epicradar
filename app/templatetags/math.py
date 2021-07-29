@@ -1,3 +1,4 @@
+from django.template.defaultfilters import stringfilter
 from pytz import NonExistentTimeError, AmbiguousTimeError
 from decimal import InvalidOperation, Decimal
 from django.utils.timezone import make_aware
@@ -6,6 +7,9 @@ import ciso8601
 import datetime
 import time
 import pytz
+
+from core.db import db
+from mining.models import Block
 
 register = template.Library()
 
@@ -20,6 +24,7 @@ def get_ts(date):
 
 
 def last_24h():
+
     now = datetime.datetime.now()
     day_ago = datetime.timedelta(hours=24)
     return now - day_ago
@@ -80,15 +85,21 @@ def d(value, places=8):
 
 @register.filter(name='color')
 def color(value):
-    if float(value) > 0:
-        return 'success'
-    else:
-        return 'danger'
+    try:
+        if float(value) > 0:
+            return 'success'
+        else:
+            return 'danger'
+    except:
+        return 'warning'
 
 
 @register.filter(name='multi')
 def multi(value, num):
-    return d(value) * d(num)
+    try:
+        return d(value) * d(num)
+    except:
+        return 0
 
 
 @register.filter(name='divide')
@@ -101,17 +112,53 @@ def divide(value, num):
 
 @register.filter(name='sub')
 def subtract(value, arg):
-    return value - arg
+    try:
+        return value - arg
+    except:
+        return 0
 
 
 @register.filter()
 def add(value, num):
-    return d(value) + d(num)
+    try:
+        return d(value) + d(num)
+    except:
+        return 0
 
 
 @register.filter()
 def satoshi(value):
-    return d(value) * 100000000
+    try:
+        return d(value) * 100000000
+    except:
+        return 0
+
+
+@register.filter
+def index(indexable, i):
+    return indexable[i]
+
+
+@register.filter()
+def get_block(height):
+    return db.get_block(height)
+
+
+@register.filter
+@stringfilter
+def upto(value, delimiter=None):
+    return value.split(delimiter)[0]
+upto.is_safe = True
+
+
+@register.filter()
+def date_obj(timestamp):
+    return datetime.datetime.utcfromtimestamp(int(timestamp))
+
+
+@register.filter()
+def pretty_url(value):
+    return value.split('//')[1]
 
 
 @register.filter()
@@ -121,15 +168,20 @@ def get_percent(value, num):
     :param num:
     :return: rounded percentage value of num
     """
-    return d(d(value) / d(num) * 100, 2)
+    try:
+        return d(d(value) / d(num) * 100, 2)
+    except:
+        return 0
 
 
-@register.filter(name='colour')
+@register.filter(name='progress_colour')
 def percentage_color(value):
-    if value < 20:
-        return f"progress-bar-danger"
-    elif 20 <= value <= 50:
-        return f"progress-bar-warning"
-    else:
-        return f"progress-bar-success"
-
+    try:
+        if value < 20:
+            return f"bg-danger"
+        elif 20 <= value <= 50:
+            return f"bg-warning"
+        else:
+            return f"bg-success"
+    except:
+        return f"bg-warning"

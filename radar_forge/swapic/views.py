@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.views import generic
 from datetime import datetime
 from decimal import Decimal
-from core.db import db
+from app.models import db
 
 
 swapic = Swapic()

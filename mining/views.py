@@ -1,5 +1,3 @@
-from core.db import db
-from .mining_calculator import Calculator
 from .forms import MiningCalculatorForm
 from django.http import JsonResponse
 from django.views import generic
@@ -19,18 +17,21 @@ def mining_ajax(request):
 class MiningView(generic.TemplateView):
     template_name = 'mining.html'
     periods = [('hour', 1 / 24), ('day', 1), ('week', 7)]
-    app = Calculator(algo='randomx', rig_hashrate=1, currency='USD')
 
     def get_context_data(self, **kwargs):
+        from mining.mining_calculator import Calculator
+        from core.db import db
         context = super(MiningView, self).get_context_data(**kwargs)
+        app = Calculator(algo='randomx', rig_hashrate=1, currency='USD')
+
         context['mining_c'] = {
-            'currency_list': self.app.currency_list,
-            'algo_list': self.app.algos,
+            'currency_list': app.currency_list,
+            'algo_list': app.algos,
             }
-        context['currency_list'] = [v['symbol'] for k, v in db.currency.items()]
-        context['algo_list'] = self.app.algos
+        context['currency_list'] = [x.symbol for x in db.data['currency'] if x.symbol != 'XXX']
+        context['algo_list'] = app.algos
         context['calc_form'] = MiningCalculatorForm()
-        context['network'] = db.network_data()
+        context['network'] = db.data['network']
         context['periods'] = self.periods
         context['segment'] = 'mining'
 
@@ -48,6 +49,7 @@ class MinerCalculatorView(generic.ListView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        from mining.mining_calculator import Calculator
         self.app = Calculator(algo='randomx', rig_hashrate=1, currency='USD')
         self.result = {}
 
@@ -62,6 +64,7 @@ class MinerCalculatorView(generic.ListView):
         return JsonResponse(self.result)
 
     def get_queryset(self):
+        from mining.mining_calculator import Calculator
         self.init_fields()
         data = {k: v.value for k, v in self.fields.items()}
         periods = self.periods
@@ -112,5 +115,5 @@ class MinerCalculatorView(generic.ListView):
 class JsonMinerCalculatorView(MinerCalculatorView):
     def get(self, request, *args, **kwargs):
         self.get_queryset()
-        # print(self.result)
+        print(self.result)
         return JsonResponse(self.result)

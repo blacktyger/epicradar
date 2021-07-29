@@ -1,6 +1,5 @@
 from django.utils import timezone
 from django.db import models
-from core.db import DataBase
 import jsonfield
 import uuid
 

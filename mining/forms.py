@@ -1,14 +1,17 @@
+from django.forms import NumberInput, Select
 from django import forms
-from django.forms import TextInput, NumberInput, RadioSelect, Select
-
-from core.db import db
 
 
 SIDES = [('buy', 'Buy'), ('sell', 'Sell')]
 PAIRS = [('btc', 'Bitcoin'), ('usd', 'USD(T)')]
 EXCHANGES = [('vitex', 'ViteX'), ('citex', 'Citex')]
 ALGOS = [('progpow', 'ProgPow (GPU)'), ('randomx',  'RandomX (CPU)')]
-CURRENCIES = [(v['symbol'], v['symbol']) for k, v in db.currency.items()]
+
+try:
+    from core.db import db
+    CURRENCIES = [(v.symbol, v.symbol) for v in db.data['currency'] if v.symbol != 'XXX']
+except:
+    CURRENCIES = ('USD', 'USD')
 
 
 class MiningCalculatorForm(forms.Form):

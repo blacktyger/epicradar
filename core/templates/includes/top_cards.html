@@ -1,4 +1,5 @@
 {% load static %} {% load humanize %} {% load math %}
+
 <!--    PRICE STATS -->
 <div class="col-lg-4 col-md-6 col-xs-12">
     <div class="card card-stats">
@@ -96,11 +97,11 @@
                         <td class="text-left">Network Hashrate</td>
                         <td class="text-left font-weight-bold">
                             RandomX: <br>
-                            {{network.hash.randomx|intword}}
+                            {{network_hash.randomx|intword}}
                         </td>
                         <td class="text-left font-weight-bold">
                             ProgPow: <br>
-                            {{network.hash.progpow|intword}}
+                            {{network_hash.progpow|intword}}
                         </td>
                     </tr>
                 </tbody>

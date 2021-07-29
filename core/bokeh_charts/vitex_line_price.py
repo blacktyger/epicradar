@@ -11,7 +11,7 @@ import numpy
 
 def vitex_price(data):
     df = pd.DataFrame(data)
-    x_start = [t_s(x) for x in df.t if sort_by_date(x, days=4)]
+    x_start = [t_s(x) for x in df.t if sort_by_date(x, days=7)]
     df['t'] = [t_s(d) for d in df['t']]
 
     df['adj_v'] = df.v / 2
@@ -27,8 +27,8 @@ def vitex_price(data):
     TOOLS = "pan,box_zoom,reset,save,xwheel_zoom"
 
     # FIGURE
-    p = figure(x_axis_type="datetime", tools=TOOLS, plot_height=300,
-               sizing_mode='stretch_both', active_scroll='xwheel_zoom')
+    p = figure(x_axis_type="datetime", tools=TOOLS, plot_height=200,
+               sizing_mode='stretch_both')
 
     p.toolbar.active_drag = None
     p.background_fill_color = None

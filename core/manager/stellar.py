@@ -1,11 +1,21 @@
+import time
+
 from stellar_sdk import Server, Keypair, TransactionBuilder, Network
-from app.templatetags.math import get_ts
 from stellar_sdk import Asset as asset_
 from operator import itemgetter
 from decimal import Decimal
 import requests
 import datetime
 import json
+
+
+def get_ts(date):
+    """ Convert datetime object to timestamp in milliseconds """
+    if not isinstance(date, str):
+        date = str(date).split(" ")[0]
+    else:
+        date = date
+    return int(time.mktime(time.strptime(date, "%Y-%m-%d"))) * 1000
 
 
 # !! ENV VARIABLE FOR PRIVATE KEYS

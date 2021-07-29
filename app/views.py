@@ -2,10 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.views import generic
-from django import template
-
 from app.context import data
 from core.db import db
+from django import template
 
 
 class HomeView(generic.TemplateView):
@@ -13,7 +12,7 @@ class HomeView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
-        context = {**context, **data}
+        context = {**context, **data(db)}
         return context
 
 
@@ -21,8 +20,6 @@ class CurrencyToEpicJsonView(generic.TemplateView):
     template_name = 'home.html'
 
     def get(self, request, *args, **kwargs):
-        base = request.GET.get('base')
-        currency = request.GET.get('currency')
         currency = "USD"
         value = db.to_epic(currency=currency)
         return JsonResponse({'value': value, 'currency': currency})

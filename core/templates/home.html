@@ -26,7 +26,6 @@
 <!--        {{text.eng.top_header_text|safe}}-->
 <!--    </div>-->
 <!--    <div class="col-lg-4 col-md-6 col-xs-12">-->
-<!--        {% include 'includes/epicentral_wallet.html' %}-->
 <!--    </div>-->
 <!--</div>-->
 
@@ -35,10 +34,14 @@
 </div>
 
 <div class="row">
-    <div class="col-xl-8 col-lg-12">
-        {% include 'includes/assets_table.html' %}
+    {% include  'includes/promo_links.html' %}
+</div>
+
+<div class="row">
+    <div class="col-xl-6 col-lg-12">
+           {% include  'includes/assets_details.html' %}
     </div>
-    <div class="col-xl-4 col-lg-12">
+    <div class="col-xl-6 col-lg-12">
         {% include 'includes/stats_card.html' %}
     </div>
 </div>
@@ -47,8 +50,6 @@
 
 {% block javascripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/2.3.1/bokeh.min.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/2.0.1/bokeh-widgets.min.js"></script> -->
-<!-- Vector Map plugin, full documentation here: http://jvectormap.com/documentation/ -->
 <script src="{% static 'assets/js/plugins/jquery-jvectormap.js' %}"></script>
 
 <script>

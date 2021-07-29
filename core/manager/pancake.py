@@ -1,12 +1,24 @@
+
 from gql.transport.exceptions import TransportServerError, TransportQueryError
 from core.manager.gql_queries import pool_volume, liquidity, ohlc
 from gql.transport.requests import RequestsHTTPTransport
-from app.templatetags.math import last_24h, str_to_ts
+from datetime import datetime, timedelta
 from json import JSONDecodeError
-from datetime import datetime
 from gql import gql, Client
 from time import sleep
+import ciso8601
+import time
 import json
+
+
+def str_to_ts(ts):
+    return int(time.mktime(ciso8601.parse_datetime(ts).timetuple()))
+
+
+def last_24h():
+    now = datetime.now()
+    day_ago = timedelta(hours=24)
+    return now - day_ago
 
 
 class PancakeAPI:
@@ -35,15 +47,16 @@ class PancakeAPI:
         tries = 4
         while not success and tries:
             try:
-                transport = RequestsHTTPTransport(url="https://graphql.bitquery.io")
+                transport = RequestsHTTPTransport(url="https://graphql.bitquery.io",
+                                                  headers={'X-API-KEY': 'BQYWuYgUbfAGHOXhETM9WeQonACWuhIH'})
                 client = Client(transport=transport, fetch_schema_from_transport=True)
                 query = gql(query)
-                print("PancakeAPI: Starting query...")
+                # print("PancakeAPI: Starting query...")
                 data = client.execute(query, variable_values=vars)
                 success = True
                 return data
             except (JSONDecodeError, TransportServerError, TransportQueryError, TypeError) as er:
-                print(er)
+                print(f"PancakeAPI: {er}")
                 print(f"PancakeAPI: response error, trying again... ({tries} left)")
                 tries -= 1
                 sleep(3)
@@ -59,7 +72,7 @@ class PancakeAPI:
         for token, address in self.contracts["pools"].items():
             vars["pool_address"] = address
             resp[token] = self._call(query=query, vars=json.dumps(vars))
-            print(f"{token} = { resp[token]}")
+            # print(f"{token} = { resp[token]}")
             r = resp[token]['ethereum']['dexTrades'][0]
             data['total'] += r['tradeAmount']
             data[token] = r
@@ -81,7 +94,7 @@ class PancakeAPI:
             for x in data[token]:
                 temp[x['currency']['symbol']] = x['value']
             data[token] = temp
-        print(data)
+        # print(data)
         return data
 
     def chart_data(self):

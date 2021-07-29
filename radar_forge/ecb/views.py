@@ -1,10 +1,11 @@
 from django.views.generic.base import TemplateView
+
+from app.models import db
 from core.manager.epic_wallet import WalletManager
 from authentication.forms import SignUpForm
 from wallet.forms import TransactionForm
 from django.http import JsonResponse
 from django.core import serializers
-from core.db import db
 from .models import *
 
 logging.basicConfig(
@@ -39,7 +40,7 @@ def initialize():
     return ecb
 
 
-blockchain = initialize()
+# blockchain = initialize()
 
 
 class PersonalWalletView(TemplateView):
@@ -123,7 +124,7 @@ class PersonalWalletView(TemplateView):
         context['ecb'] = {
             'transaction_form': TransactionForm(),
             'transactions': Transaction.objects.filter(status='completed'),
-            'coinbase': blockchain.coinbase,
+            # 'coinbase': blockchain.coinbase,
             'wallets': Wallet.objects.all(),
             'volume': sum(tx.amount for tx in Transaction.objects.filter(status='completed'))
             }

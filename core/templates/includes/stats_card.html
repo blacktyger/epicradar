@@ -1,50 +1,216 @@
 {% load static %} {% load humanize %} {% load math %}
 
+{% with mining_info as info %}
 <div class="card">
-    <div class="card-header card-header-info card-header-icon">
+    <div class="card-header card-header-primary card-header-icon">
         <div class="card-icon">
             <i class="material-icons">handyman</i>
         </div>
-        <h3 class="card-title">Mining info</h3>
+        <div class="row">
+            <div class="col-md-5 col-lg-4">
+                <h3 class="card-title">Mining info</h3>
+            </div>
+            <div class="col-lg-8 col-md-7 d-none d-sm-block">
+                <h3 class="card-title text-end">
+                    Mining stats for last <span class="fw-bold">{{mining_stats.blocks.count}}</span> blocks.
+                </h3>
+            </div>
+        </div>
     </div>
-    <div class="card-body px-3 fs-6 my-3">
-        <div class="">
-            <img class="mb-2 mr-1" src="{% static 'epic-icon.png' %}">
-            <span class="fw-bold">12,123,233</span>
-                out of
-            <span class="fw-bold">21 million</span>
-            in circulation
-            <div class="w-75">
-                <div class="progress mt-2" style="height: 18px!important;">
-                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar"
-                         style="width: 52%;" aria-valuenow="52" aria-valuemin="0" aria-valuemax="100"></div>
-                    <span class="fw-bold">52%</span>
+    <div class="card-body px-3 fs-6 my-2">
+        <div class="row">
+            <div class="col-md-6">
+                <img class="mb-2 mr-1" src="{% static 'epic-icon.png' %}">
+                <span class="fw-bold">{{info.circulating|intcomma}}</span>
+                    out of
+                <span class="fw-bold">21 million</span>
+                in circulation
+                <div class="w-100 mb-2">
+                    <div class="progress mt-2 mb-0" style="height: 16px!important;">
+                        <div class="progress-bar progress-bar-striped {{progress_colour}}" role="progressbar"
+                             style="width: {{info.mined_|floatformat:0}}%;" aria-valuenow="{{info.mined_|floatformat:0}}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <span class="fw-bold text-muted">{{info.mined_|floatformat:1}}%</span>
+                    </div>
+                    <div class="row mt- px-1">
+                        <div class="col-6">
+                            <small class="text-muted">Already mined</small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted">Total supply</small>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    Mined in 24h:
+                    <span class="fw-bold">{{info.mined_24h.blocks|floatformat:0|intcomma}}</span> blocks |
+                    <span class="fw-bold">{{info.mined_24h.coins|floatformat:0|intcomma}}</span> coins
+                </p>
+                <p>
+                    Block Reward:
+                    <span class="fw-bold">{{info.block_reward|floatformat:2}} EPIC</span>
+                </p>
+                <p>
+                    Block Value:
+                    <span class="fw-bold">{{info.block_value|floatformat:2}} USD</span>
+                </p>
+                <p>
+                    Halving Height:
+                    <span class="fw-bold">{{info.halving.height|intcomma}}</span>
+                    <span class="badge bg-primary">
+                        {{info.halving.date|date:"d/M/y"}}
+                    </span>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-12 my-2">
+                        <h5 class="text-center">
+                            Last block
+                            <a href="https://explorer.epic.tech/blockdetail/{{mining_stats.last_block.height}}"
+                               target="_blank"><i class="fas fa-cube"></i> {{mining_stats.last_block.height|intcomma}}</a>
+                            found by
+                            <span class="fw-bold">
+                                {% if mining_stats.last_block.pool %}
+                                    <a target="_blank" href="{{mining_stats.last_block.pool.url}}">{{mining_stats.last_block.pool.url|pretty_url}}</a>
+                                {% else %}
+                                    <span class="fw-bold">Unknown</span>
+                                {% endif %}
+                            </span>
+                        </h5>
+                    </div>
+                    <div class="col-12 my-2">
+                        <canvas id="myChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="">
-            <p>
-                Mined in 24h:
-                <span class="fw-bold">1389</span> blocks |
-                <span class="fw-bold">11,254</span> coins
-            </p>
-            <p>
-                Block Reward:
-                <span class="fw-bold">8 EPIC</span>
-            </p>
-            <p>
-                Block Value:
-                <span class="fw-bold">3.87 USD</span>
-            </p>
-            <p>
-                Halving Height:
-                <span class="fw-bold">1,157,760</span>
-                <span class="badge bg-primary">
-                    approx. 22 NOVEMBER 2021
-                </span>
-            </p>
+        <hr />
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-borderless w-100">
+                        <tr>
+                            <td colspan="2" class="fs-5">
+                                <p>
+                                    <img class="mb-2 mr-1" src="{% static 'epic-icon.png' %}">
+                                    Epic-Cash Pools
+                                </p>
+                            </td>
+                            <td><i class="fas fa-user-cog"></i> Workers</td>
+                            <td><i class="fas fa-cogs"></i> Hashrate</td>
+                            <td><i class="fas fa-cube"></i> Last found</td>
+                            <td><i class="fas fa-cubes"> last 100</i></td>
+                        </tr>
+                        <tbody>
+                        {% for pool in mining_stats.pools %}
+                            <tr>
+                                <td>
+                                    <a target="_blank" href="{{pool.url}}">
+                                        {{pool.url|pretty_url}}
+                                    </a>
+                                </td>
+                                <td class="">
+                                    {% if pool.is_online %}
+                                        <i class="fas fa-globe text-success"></i> Online
+                                    {% else %}
+                                        <i class="fas fa-globe text-danger"></i> Offline
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {{pool.workers_count}}
+                                </td>
+                                <td>
+                                    {{pool.total_hashrate|intword}}
+                                </td>
+                                <td>
+                                    <i class="fas fa-cube"></i>
+                                    <a href="https://explorer.epic.tech/blockdetail/{{pool.last_found}}"
+                                        target="_blank">{{pool.last_found|intcomma}}</a>
+                                    {% with pool.last_found|get_block as block %} <br />
+                                    <span class="text-muted"><small>{{block.date|timesince|upto:','}} ago</small></span>
+                                    {% endwith %}
+                                </td>
+                                <td class="text-center">
+                                    {{pool.blocks_in_last100}}%
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-
-
     </div>
 </div>
+{% endwith %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+
+<script>
+var data = {
+  labels: [{% for pool in mining_stats.pools %}
+            "{{pool.name.capitalize}} ({{ pool.block.all.count|get_percent:mining_stats.blocks.count|floatformat:0 }}%)",
+            {% endfor %}
+            "Unknown ({{ mining_stats.solo_blocks.count|get_percent:mining_stats.blocks.count|floatformat:0 }}%)"
+            ],
+
+  datasets: [
+    {
+      data: [{% for pool in mining_stats.pools %}
+            "{{pool.block.all.count}}",
+            {% endfor %}
+            {{ mining_stats.solo_blocks.count }}
+            ],
+
+      backgroundColor: [{% for color in mining_stats.colors %}
+            "{{color}}",
+            {% endfor %}]
+    }]
+};
+
+Chart.pluginService.register({
+  beforeDraw: function(chart) {
+    var width = chart.chart.width,
+        height = chart.chart.height,
+        ctx = chart.chart.ctx,
+        type = chart.config.type;
+
+    if (type == 'doughnut')
+    {
+    	var percent = Math.round((chart.config.data.datasets[0].data[0] * 100) /
+                    (chart.config.data.datasets[0].data[0] +
+                    chart.config.data.datasets[0].data[1]));
+			var oldFill = ctx.fillStyle;
+      var fontSize = ((height - chart.chartArea.top) / 100).toFixed(2);
+
+      ctx.restore();
+      ctx.font = fontSize + "em sans-serif";
+      ctx.textBaseline = "middle"
+
+      var text = '{{ mining_stats.blocks.count }}',
+          textX = Math.round((width - ctx.measureText(text).width) / 2),
+          textY = (height + chart.chartArea.top) / 2;
+
+      ctx.fillStyle = chart.config.data.datasets[0].backgroundColor[0];
+      ctx.fillText(text, textX, textY);
+      ctx.fillStyle = oldFill;
+      ctx.save();
+    }
+  }
+});
+
+var myChart = new Chart(document.getElementById('myChart'), {
+  type: 'doughnut',
+  data: data,
+  options: {
+  	responsive: true,
+    legend: {
+      display: true
+    }
+  }
+});
+
+</script>

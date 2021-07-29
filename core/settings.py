@@ -4,7 +4,6 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os
-from decouple import config
 from unipath import Path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -18,6 +17,10 @@ SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+if DEBUG:
+    import mimetypes
+
+    mimetypes.add_type("application/javascript", ".js", True)
 
 # load production server from .env
 ALLOWED_HOSTS = ['*']
@@ -33,12 +36,14 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_extensions',
     'rest_framework',
-    'qr_code',
-    'wallet',
+    'background_task',
+    'debug_toolbar',
+    # 'qr_code',
+    # 'wallet',
     'mining',
-    'swapic',
-    'blog',
-    'ecb',
+    # 'swapic',
+    # 'blog',
+    # 'ecb',
     'app'
     ]
 REST_FRAMEWORK = {
@@ -50,6 +55,7 @@ REST_FRAMEWORK = {
     }
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,6 +66,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     ]
 
+INTERNAL_IPS = ['127.0.0.1', 'localhost']
 ROOT_URLCONF = 'core.urls'
 LOGIN_REDIRECT_URL = "home"  # Route defined in app/urls.py
 LOGOUT_REDIRECT_URL = "home"  # Route defined in app/urls.py
@@ -86,10 +93,21 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': 'db.sqlite3',
+#         }
+#     }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'epicradar',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
         }
     }
 
@@ -114,15 +132,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-uk'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/London'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #############################################################
 # SRC: https://devcenter.heroku.com/articles/django-assets
@@ -139,6 +159,9 @@ STATICFILES_DIRS = (
 
 #############################################################
 #############################################################
+
+SHELL_PLUS_PRINT_SQL = True
+SHELL_PLUS = "ipython"
 
 LOGGING = {
     'version': 1,

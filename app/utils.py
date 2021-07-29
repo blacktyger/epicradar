@@ -1,32 +1,7 @@
-import datetime
-
 from app.templatetags.math import t_s
-from core.db import db
-import ciso8601
+from decimal import Decimal
+import datetime
 import time
-
-
-def total_volumes():
-    vitex = float(db.vitex['ticker']['quantity'])
-    stellar = float(db.stellar['sepic_xlm']['vol_24h'])
-    pancake = float(db.pancake['volume_24']['total'])
-    return vitex + stellar + pancake
-
-
-def liquidity(chain):
-    if chain == "stellar":
-        stellar = db.orderbook['stellarx']['xlm']
-        s_bids = sum(x[1] for x in stellar['bids'])
-        s_asks = sum(x[1] for x in stellar['asks'])
-        stellar_l = s_bids + s_asks
-        return stellar_l * db.epic_vs_usd
-
-    elif chain == 'vitex':
-        vitex = db.orderbook['vitex']['btc']
-        v_bids = sum(float(x[1]) for x in vitex['bids'])
-        v_asks = sum(float(x[1]) for x in vitex['asks'])
-        vitex_l = v_bids + v_asks
-        return vitex_l * db.epic_vs_usd
 
 
 def nearest(li, pivot):
@@ -43,10 +18,7 @@ def change(data, chain, current_price):
     now = datetime.datetime.now()
     day_ago = datetime.timedelta(hours=24)
     day_ago = int(datetime.datetime.timestamp(now - day_ago))
-    value = ''
     old_price = 0
-    color = 'success'
-    arrow = '<i class="fas fa-arrow-up"></i>'
 
     if chain == 'vitex':
         d = {'time': data['t'],
@@ -55,53 +27,64 @@ def change(data, chain, current_price):
     elif chain == "stellar":
         d = {'time': [int(x['time']) for x in data],
              'price': [float(x['price']) for x in data]}
-
-        # for i, x in enumerate(d['time']):
-        #     print(t_s(x))
-        #     print(d['price'][i])
-
+        d['time'].reverse()
+        d['price'].reverse()
     else:
         d = {'time': data['time'],
              'price': data['price']}
 
     if chain == "stellar":
-        temp = []
         try:
-            for i, ts in enumerate(d['time']):
-                if now.day - 1 == t_s(ts).day:
-                    old_price = d['price'][i]
-                    temp.append((t_s(ts), old_price))
-            old_price = temp[-1][1]
+            old_price = 0
+            for t, p in zip(d['time'], d['price']):
+                if t_s(t).day == now.day - 1 and t_s(t).month == now.month:
+                    old_price = p
+                    print((t_s(t), old_price))
 
         except IndexError as er:
             print(er)
-            for i, ts in enumerate(d['time']):
-                if (ts + 86_400) <= time.time():
-                    old_price = d['price'][i]
-                    break
-                else:
-                    old_price = d['price'][1]
-                    # print(t_s(ts), old_price)
-
+            old_price = 0
     else:
         for i, ts in enumerate(d['time']):
-            if (ts + 86_400) >= time.time():
+            if (ts + 86_400) > time.time():
+                if ts < day_ago:
+                    old_price = 0
+                    break
                 old_price = d['price'][i]
                 break
 
     if old_price != 0:
+        old_price = Decimal(old_price)
         diff = current_price - old_price
         if diff < 0:
             color = 'danger'
             arrow = '<i class="fas fa-arrow-down"></i>'
+            value = diff / old_price * 100
 
-        value = diff / old_price * 100
+        elif diff > 0:
+            color = 'success'
+            arrow = '<i class="fas fa-arrow-up"></i>'
+            value = diff / old_price * 100
 
-        if 0 <= value < 0.01:
+        else:
             color = 'dark'
             arrow = ''
+            value = 0
+    else:
+        color = 'dark'
+        arrow = ''
+        value = 0
 
-    return {'color': color, 'arrow': arrow, 'value': value}
+    try:
+        last_trade = datetime.datetime.fromtimestamp(d['time'][-1])
+    except:
+        last_trade = datetime.datetime.fromtimestamp(d['time'][-1]/1000)
+
+    print(chain, last_trade)
+
+    return {'color': color, 'arrow': arrow,
+            'value': value, 'last_trade': last_trade}
+
 
 """
 

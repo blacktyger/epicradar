@@ -1,28 +1,32 @@
-import json
+import errno
+import socket
+import time
 
-import requests
+
+def ping_address(host, timeout=2):
+    if ':' in host:
+        old_host = host.split(':')
+        host = old_host[0]
+        port = int(old_host[1])
+        print(host, port)
+    else:
+        port = 3415
+
+    s = socket.socket()
+    s.settimeout(timeout)
+    result = False
+    start = time.time()
+    try:
+        s.connect((host, port))
+        s.close()
+        result = True
+        end = time.time()
+        ms = 1000 * (end - start)
+        return result, int(ms)
+    except (socket.gaierror, socket.timeout) as e:
+        print(e)
+
+    return result
 
 
-def vitex_data():
-    queries = {'candles': 'klines?symbol=', 'ticker': 'ticker/24hr?symbols='}
-    symbol = 'EPIC-002_BTC-000'
-
-    def vitex_api(query, extra='&interval=hour&limit=168'):
-        start_url = "https://api.vitex.net/api/v2/"
-        if query == "klines?symbol=":
-            url = start_url + query + symbol + extra
-        else:
-            url = start_url + query + symbol
-        # print(f"{url}...")
-        return json.loads(requests.get(url).content)
-
-    resp = {query: vitex_api(queries[query]) for query in queries}
-
-    d = {'candles': resp['candles']['data'],
-         'ticker': resp['ticker']['data'][0]}
-
-    data = {'time': d['candles']['t'], 'price': d['candles']['c']}
-
-    return data
-
-vitex_data()
+print(ping_address('51pool.online:4616'))
