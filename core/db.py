@@ -23,9 +23,13 @@ class DataBase:
             self.data = self._data()
         except Exception as e:
             print(e)
-            self.init_db()
-            self.update()
-            self.data = self._data()
+            try:
+                self.init_db()
+                self.update()
+                self.data = self._data()
+            except Exception as e:
+                print(e)
+                pass
 
     @Timer('all_data')
     def _data(self):

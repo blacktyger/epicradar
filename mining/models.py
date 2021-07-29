@@ -151,16 +151,14 @@ class BlockManager:
 
 
 class PoolManager:
-    def __init__(self):
-        self.pools = Pool.objects.all()
-        if self.pools.count() < 1:
-            self.init_data()
-
     @Timer('pool_data')
     def _data(self):
         kwargs = {'pool': Pool, 'data': {}}
+        pools = Pool.objects.all()
+        if not pools:
+            self.init_data()
 
-        for pool in self.pools:
+        for pool in Pool.objects.all():
             kwargs['pool'] = pool
             kwargs['data']['ping'] = self.ping_pool(pool.name)
             try:
@@ -172,7 +170,7 @@ class PoolManager:
 
     def ping_pool(self, pool):
         if isinstance(pool, str):
-            pool = self.pools.get(name=pool)
+            pool = Pool.objects.get(name=pool)
 
         data = {'pool_online': False, 'stratums': {}}
 
@@ -189,7 +187,7 @@ class PoolManager:
 
     def stats_parser(self, pool):
         if isinstance(pool, str):
-            pool = self.pools.get(name=pool)
+            pool = Pool.objects.get(name=pool)
 
         data = {'stats': {}, 'blocks': [], 'block_stats': {}}
 
@@ -240,24 +238,24 @@ class PoolManager:
         print(f'{len(POOLS)} NEW POOLS CREATED')
 
     def get_51pool(self):
-        pool = self.pools.get(name='51pool')
+        pool = Pool.objects.get(name='51pool')
         stats_api = json.loads(requests.get(f"{pool.api_url}", timeout=10).content)
         # block_api = json.loads(requests.get(f"{pool.api_url}blocks", timeout=5).content)[0]
         return stats_api
 
     def get_icemining(self):
-        pool = self.pools.get(name='icemining')
+        pool = Pool.objects.get(name='icemining')
         stats_api = json.loads(requests.get(f"{pool.api_url}currencies", timeout=10).content)['EPIC']
         block_api = json.loads(requests.get(f"{pool.api_url}blocks", timeout=10).content)
         return stats_api, block_api
 
     def get_epicmine(self):
-        pool = self.pools.get(name='epicmine')
+        pool = Pool.objects.get(name='epicmine')
         stats_api = json.loads(requests.get(f"{pool.api_url}", timeout=10).content)
         return stats_api
 
     def get_fastepic(self):
-        pool = self.pools.get(name='fastepic')
+        pool = Pool.objects.get(name='fastepic')
 
 
 
