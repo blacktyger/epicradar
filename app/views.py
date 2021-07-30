@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.views import generic
 from app.context import data
-from core.db import db
+from core.db import db, DataBase
 from django import template
 
 
@@ -12,7 +12,7 @@ class HomeView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
-        context = {**context, **data(db)}
+        context = {**context, **data(DataBase())}
         return context
 
 

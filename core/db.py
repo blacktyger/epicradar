@@ -41,12 +41,12 @@ class DataBase:
             'orderbook': self._orderbook(),
             'explorer': self._explorer(),
             'network': self._network(),
-            'coins': deepcopy(Coin.objects.all()),
-            'prices': deepcopy(Price.objects.all()),
-            'currency': deepcopy(Currency.objects.all()),
-            'pools': deepcopy(Pool.objects.all()),
-            'pool_stats': deepcopy(PoolStats.objects.all()),
-            'blocks': deepcopy(Block.objects.all()),
+            'coins': Coin.objects.all(),
+            'prices': Price.objects.all(),
+            'currency': Currency.objects.all(),
+            'pools': Pool.objects.all(),
+            'pool_stats': PoolStats.objects.all(),
+            'blocks': Block.objects.all(),
             }
 
         p = data['prices']
@@ -62,10 +62,10 @@ class DataBase:
             }
 
         data['mining_stats'] = {
-            'pools': data['pools'].order_by('name'),
-            'blocks': data['blocks'],
-            'last_block': data['blocks'].order_by('height').last(),
-            'last_100': data['blocks'].order_by('-height')[:100],
+            'pools': Pool.objects.order_by('name'),
+            'blocks': Block.objects.all(),
+            'last_block': Block.objects.order_by('height').last(),
+            'last_100': Block.objects.order_by('-height')[:100],
             'solo_blocks': BlockManager().get_solo_blocks(),
             'colors': ['#3984BC', '#812D86', '#CBB128', '#4B565F'],
             }

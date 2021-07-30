@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from core.secrets import epic_wallet_api_secret, epic_wallet_password
 # from wallet.tools import Command
 from decimal import Decimal
@@ -16,7 +18,7 @@ class WalletManager:
                  api_secret=epic_wallet_api_secret,
                  password=epic_wallet_password):
         self.receive_address = f"{hostname}/wallet"
-        self.blockchain_file = "epic-wallet.exe"
+        self.blockchain_dir = '"/home/blacktyger/.epic/main/chain_data"'
         self.node = f"{hostname}/node"
         self.hostname = hostname
         self.port = port
@@ -25,15 +27,11 @@ class WalletManager:
         self.password = password
         self.auth = ('epic', self.api_secret)
 
-    @staticmethod
-    def blockchain_size():
-        return 1.60
-        # return round(os.stat(self.blockchain_file).st_size / 1024000000, 2)
-
-    # def command(self, cmd):
-    #     data = Command(command=cmd, password=self.password, node=self.node)
-    #     # print(data.stdout)
-    #     return data.stdout
+    def blockchain_size(self):
+        try:
+            return round(sum(file.stat().st_size for file in Path(self.blockchain_dir).rglob('*'))/10**9, 2)
+        except:
+            return 1.60
 
     def node_is_online(self):
         url = f"{self.node}/v1/status"
