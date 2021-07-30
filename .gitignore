@@ -28,3 +28,10 @@ staticfiles/*
 /core/settings.py
 
 /app/jobs/
+/app/migrations/
+/mining/migrations/
+/radar_forge/
+/.env
+/network_difficulty.csv
+/network_hashrate.csv
+/core/templates/parts/
