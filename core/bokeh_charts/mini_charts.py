@@ -129,7 +129,7 @@ def pancake_mini_chart(data):
     data = [x for x in temp if sort_by_date(x['time'], days=7)]
 
     if not data:
-        data = [x for x in temp if sort_by_date(x['time'], days=30)]
+        data = [x for x in temp if sort_by_date(x['time'], days=60)]
 
     df = pd.DataFrame(data)
     source = ColumnDataSource(df)

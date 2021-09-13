@@ -119,9 +119,11 @@ class Calculator:
         Calculate time needed to mine block solo based on rig_hashrate and block algorithm
         network_hashrate() / rig_hashrate * blocks_per_day
         """
+        print(self.rig_hashrate, self.network_hash(), self.blocks_per_day())
         blocks_per_day = Decimal(self.rig_hashrate / self.network_hash()) * self.blocks_per_day()
         hours_for_one_block = 24 / blocks_per_day
         block_reward = self.reward()[2]
+        
         block_value = self.currency.value * self.usd_price * Decimal(block_reward)
 
         return {'hours_for_one_block': float(hours_for_one_block), 'days': float(hours_for_one_block / 24),
@@ -172,9 +174,13 @@ class Calculator:
         """
         Calculate rig reward based on rig_hashrate and block algorithm
         """
-        if self.rig_hashrate and self.algo:
-            rig_vs_net = Decimal(self.rig_hashrate / self.network_hash())
-            epic_amount = rig_vs_net * self.blocks_per_day() * Decimal(self.reward()[2]) * self.period
-        else:
-            epic_amount = 0
-        self.mining_reward = Decimal(epic_amount)
+        try:
+            if self.rig_hashrate and self.algo:
+                rig_vs_net = Decimal(self.rig_hashrate / self.network_hash())
+                epic_amount = rig_vs_net * self.blocks_per_day() * Decimal(self.reward()[2]) * self.period
+            else:
+                epic_amount = 0
+            self.mining_reward = Decimal(epic_amount)
+        except Exception as e:
+            print(e)
+            self.mining_reward = Decimal(0)

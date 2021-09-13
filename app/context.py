@@ -85,7 +85,7 @@ def data(db):
                 'liquidity': liquidity('stellar')
                 },
             'pancake': {
-                'chart': pancake_mini_chart(pancake['chart_data']),
+                # 'chart': pancake_mini_chart(pancake['chart_data']),
                 'chain_link': "https://www.binance.org/en",
                 'trade_link': "https://exchange.pancakeswap.finance/#/swap?outputCurrency=0x2cca66321b8f275339e622af66059ef251b38893&inputCurrency=BNB",
                 'change': change(pancake['chart_data'], 'pancake', db.get_price('epic', 'bnb')),

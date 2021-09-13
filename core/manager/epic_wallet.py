@@ -18,7 +18,7 @@ class WalletManager:
                  api_secret=epic_wallet_api_secret,
                  password=epic_wallet_password):
         self.receive_address = f"{hostname}/wallet"
-        self.blockchain_dir = '"/home/blacktyger/.epic/main/chain_data"'
+        self.blockchain_dir = "/home/blacktyger/.epic/main/chain_data"
         self.node = f"{hostname}/node"
         self.hostname = hostname
         self.port = port
@@ -30,7 +30,8 @@ class WalletManager:
     def blockchain_size(self):
         try:
             return round(sum(file.stat().st_size for file in Path(self.blockchain_dir).rglob('*'))/10**9, 2)
-        except:
+        except Exception as e:
+            print(e)
             return 1.60
 
     def node_is_online(self):

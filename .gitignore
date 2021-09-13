@@ -35,3 +35,5 @@ staticfiles/*
 /network_difficulty.csv
 /network_hashrate.csv
 /core/templates/parts/
+/gunicorn_start
+/epicradar/

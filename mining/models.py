@@ -63,8 +63,10 @@ class Pool(models.Model):
         if obj.pool.name == 'icemining':
             workers_count += int(obj_data['workers'])
         else:
-            workers_count += int(obj_data['onlineRandomX'])
-            workers_count += int(obj_data['onlineProgPow'])
+            try:workers_count += int(obj_data['onlineRandomX'])
+            except Exception: workers_count += 0
+            try:workers_count += int(obj_data['onlineProgPow'])
+            except Exception: workers_count += 0
             try: workers_count += int(obj_data['onlineCuckoo'])
             except Exception: workers_count += 0
         return workers_count
@@ -128,12 +130,12 @@ class BlockManager:
         return Block.objects.filter(pool__isnull=True)
 
     def add_block(self, **kwargs):
-        block, created = Block.objects.get_or_create(height=int(kwargs['height']))
-
-        for k, v in kwargs.items():
-            if getattr(block, k) != v:
-                setattr(block, k, v)
-                block.save()
+        block = Block.objects.filter(height=int(kwargs['height']))
+        if block:
+            block.update(**kwargs)
+        else:
+            Block.objects.create(**kwargs)
+              
 
     @Timer('blocks_data')
     def _data(self):
@@ -164,9 +166,11 @@ class PoolManager:
             self.init_data()
 
         for pool in Pool.objects.all():
+            #print(f"{pool} PINGING")
             kwargs['pool'] = pool
             kwargs['data']['ping'] = self.ping_pool(pool.name)
             try:
+                #print(f"{pool} STATS")
                 kwargs['data']['stats'] = self.stats_parser(pool.name)
                 PoolStats.objects.create(**kwargs)
             except requests.exceptions.ReadTimeout as er:
@@ -225,12 +229,11 @@ class PoolManager:
                     'height': block['blockHeight'],
                     'algorithm': block['algo'].lower(),
                     'timestamp': block['time'],
-
                     'date': make_aware(datetime.datetime.utcfromtimestamp(int(block['time'])), timezone=tz.gettz('GMT')),
-
                     'hash': block['hash'],
                     'pool': pool
                     }
+                #print(kwargs)
                 BlockManager().add_block(**kwargs)
 
         return data

@@ -270,8 +270,10 @@
                 console.log(data.solo_block);
                 $('#solo_block').text((data.solo_block.hours_for_one_block).toFixed(2) + 'h');
                 if (data.solo_block.hours_for_one_block > 25) {
-                        $('#solo_block_days').text('(' + (data.solo_block.days).toFixed(1) + ' days)')
-                    }
+                    $('#solo_block_days').text('(' + (data.solo_block.days).toFixed(1) + ' days)')
+                } else {
+                    $('#solo_block_days').text('')
+                }
 
                 {% for period in periods %}
                     $('.td_1_{{period.0}}').text('{{period.0}}');
